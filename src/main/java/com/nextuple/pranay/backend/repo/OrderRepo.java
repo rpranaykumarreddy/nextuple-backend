@@ -8,6 +8,6 @@ import org.springframework.data.mongodb.repository.Query;
 import java.util.List;
 
 public interface OrderRepo extends MongoRepository<Order, String> {
-//    @Query("{'productCatalog.productId': ?0}")
-//    List<Order> findOrdersByProductId(String productId);
+    @Query("{'productCatalog.productId': ?0}")
+    List<Order> findOrdersByProductId(String productId);
 }

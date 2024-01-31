@@ -7,20 +7,30 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-@Document(collection = "product")
+@Document(collection = "order")
 public class Order {
     @Id
     private String id;
     private OrderType type = OrderType.SALE_ORDER;
     private List<ProductDetails> productCatalog = new ArrayList<>();
-
+    private double totalPrice;
     private LocalDateTime lastTime;
+
+    public double getTotalPrice() {
+        return totalPrice;
+    }
+
+    public void setTotalPrice(double totalPrice) {
+        this.totalPrice = totalPrice;
+        updateTimeStamp();
+    }
 
     public enum OrderType{SALE_ORDER, PURCHASE_ORDER}
 
-    public Order(List<ProductDetails> productCatalog,OrderType type) {
+    public Order(List<ProductDetails> productCatalog, OrderType type, double totalPrice) {
         this.type = type;
         this.productCatalog = productCatalog;
+        this.totalPrice = totalPrice;
         updateTimeStamp();
     }
 

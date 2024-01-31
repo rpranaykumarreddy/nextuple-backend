@@ -23,11 +23,11 @@ public class Controller {
         return service.createProduct(product);
     }
     @GetMapping("/product/{productId}")
-    public Product FindProductById(@PathVariable String productId){
+    public Product findProductById(@PathVariable String productId){
         return service.findProductById(productId);
     }
     @PutMapping("/product/{productId}")
-    public ResponseEntity<Product> UpdateProductById(@PathVariable String productId,@RequestBody Product productChanges){
+    public ResponseEntity<Product> updateProductById(@PathVariable String productId,@RequestBody Product productChanges){
         Product updatedProduct = service.updateProductById(productId, productChanges);
         if(updatedProduct !=null){
             return new ResponseEntity<>(updatedProduct, HttpStatus.OK);
@@ -36,32 +36,32 @@ public class Controller {
         }
     }
     @DeleteMapping("/product/{productId}")
-    public boolean DeleteProductById(@PathVariable String productId){
+    public boolean deleteProductById(@PathVariable String productId){
         return service.deleteProductById(productId);
     }
     @GetMapping("/product-list")
-    public List<Product> ListAllProducts(){return service.listAllProducts();
+    public List<Product> listAllProducts(){return service.listAllProducts();
     }
 
     /*
      * Inventory Alone
      */
     @PostMapping("/create-inventory")
-    public Inventory CreateInventory(@RequestBody Inventory inventory){
+    public Inventory createInventory(@RequestBody Inventory inventory){
 
         return service.createInventory(inventory);
     }
 
     @GetMapping("/inventory/{inventoryId}")
-    public Inventory FindInventoryById(@PathVariable String inventoryId){
+    public Inventory findInventoryById(@PathVariable String inventoryId){
         return service.findInventoryById(inventoryId);
     }
     @GetMapping("/inventory/product/{productId}")
-    public List<Inventory> FindInventoryByProductId(@PathVariable String productId){
+    public List<Inventory> findInventoryByProductId(@PathVariable String productId){
         return service.findInventoryByProductId(productId);
     }
     @PutMapping("/inventory/{inventoryId}")
-    public ResponseEntity<Inventory> UpdateInventoryById(@PathVariable String inventoryId,@RequestBody Inventory InventoryChanges){
+    public ResponseEntity<Inventory> updateInventoryById(@PathVariable String inventoryId,@RequestBody Inventory InventoryChanges){
         Inventory updatedInventory = service.updateInventoryById(inventoryId, InventoryChanges);
         if(updatedInventory !=null){
             return new ResponseEntity<>(updatedInventory, HttpStatus.OK);
@@ -70,11 +70,11 @@ public class Controller {
         }
     }
     @DeleteMapping("/inventory/{inventoryId}")
-    public boolean DeleteInventoryById(@PathVariable String inventoryId){
+    public boolean deleteInventoryById(@PathVariable String inventoryId){
         return service.deleteInventoryById(inventoryId);
     }
     @GetMapping("/inventory-list")
-    public List<Inventory> ListAllInventory(){
+    public List<Inventory> listAllInventory(){
         return service.listAllInventory();
     }
 
@@ -82,16 +82,29 @@ public class Controller {
      * Order
      */
     @PostMapping("/create-sale-order")
-    public Order CreateSaleOrder(@RequestBody Order productCatalog){
+    public Order createSaleOrder(@RequestBody Order productCatalog){
         return service.createSaleOrder(productCatalog.getProductCatalog());
     }
     @PostMapping("/create-purchase-order")
-    public Order CreatePurchaseOrder(@RequestBody Order productCatalog){
+    public Order createPurchaseOrder(@RequestBody Order productCatalog){
         return service.createPurchaseOrder(productCatalog.getProductCatalog());
     }
     @GetMapping("/order-list")
-    public List<Order> ListAllOrders(){
+    public List<Order> listAllOrders(){
         return service.listAllOrders();
     }
 
+    @GetMapping("/order/{orderId}")
+    public Order findOrderById(@PathVariable String orderId){
+        return service.findOrderById(orderId);
+    }
+    @GetMapping("/order/product/{productId}")
+    public List<Order> findOrderByProductId(@PathVariable String productId){
+        return service.findOrderByProductId(productId);
+    }
+
+    @DeleteMapping("/order/{orderId}")
+    public boolean deleteOrderById(@PathVariable String orderId){
+        return service.deleteOrderById(orderId);
+    }
 }
