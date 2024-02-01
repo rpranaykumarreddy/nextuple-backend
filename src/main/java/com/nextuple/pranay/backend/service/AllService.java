@@ -1,5 +1,6 @@
 package com.nextuple.pranay.backend.service;
 
+import com.nextuple.pranay.backend.exception.defined.ProductNotFoundException;
 import com.nextuple.pranay.backend.model.Inventory;
 import com.nextuple.pranay.backend.model.Order;
 import com.nextuple.pranay.backend.model.Product;
@@ -7,6 +8,8 @@ import com.nextuple.pranay.backend.repo.InventoryRepo;
 import com.nextuple.pranay.backend.repo.OrderRepo;
 import com.nextuple.pranay.backend.repo.ProductRepo;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import  org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,15 +27,15 @@ public class AllService {
 
     @Autowired
     OrderRepo orderRepo;
-    public Product createProduct(Product product){
+    public ResponseEntity<Product> createProduct(Product product){
         product.updateTimeStamp();
         productRepo.save(product);
-        return product;
+        return new ResponseEntity<>(product,HttpStatus.CREATED);
     }
     public Product findProductById(String productId){
         return productRepo.findById(productId).orElse(null);
     }
-    public Product updateProductById(String productId, Product productChanges){
+    public ResponseEntity<?> updateProductById(String productId, Product productChanges){
         Optional <Product> optionalProduct= productRepo.findById(productId);
 
         if(optionalProduct.isPresent()){
@@ -49,9 +52,10 @@ public class AllService {
 
             Product save = productRepo.save(presentProduct);
             System.out.println(save);
-            return save;
+            return new ResponseEntity<>(save, HttpStatus.OK);
         }else{
-            return null;
+            throw new ProductNotFoundException("Product ID:" + productId);
+//            return new ResponseEntity<>(productId+": Product Not Found",HttpStatus.NOT_FOUND);
         }
     }
     public boolean deleteProductById(String productId){
@@ -124,7 +128,7 @@ public class AllService {
      * Order
      */
     @Transactional
-    public Order createSaleOrder(List<Order.ProductDetails> productCatalog) {
+    public ResponseEntity<?> createSaleOrder(List<Order.ProductDetails> productCatalog) {
         double totalPrice=0.0;
         List<Inventory> updatedInventories = new ArrayList<>();
         for(Order.ProductDetails productDetails: productCatalog){
@@ -138,18 +142,20 @@ public class AllService {
                         return null;
                     }
                     totalPrice += (productDetails.getPrice()>0
-                            ? productDetails.getPrice():product.getPrice())* requestedQuantity;
+                            ? productDetails.getPrice() : product.getPrice())* requestedQuantity;
+                    if(productDetails.getPrice()<=0)
+                        productDetails.setPrice(product.getPrice());
                     updatedInventories.addAll(updatedInventory);
                 } else{
-                    return null;
+                    return new ResponseEntity<>(productDetails.getProductId()+" Quantity not available",HttpStatus.CONFLICT);
                 }
             }else{
-                return null;
+                return new ResponseEntity<>(productDetails.getProductId()+" Not found",HttpStatus.BAD_REQUEST);
             }
         }
         inventoryRepo.saveAll(updatedInventories);
         Order order= new Order(productCatalog, Order.OrderType.SALE_ORDER, totalPrice);
-        return orderRepo.save(order);
+        return new ResponseEntity<>(orderRepo.save(order), HttpStatus.CREATED);
     }
 
     private List<Inventory> deductFromInventory(String productId, int requestedQuantity) {
@@ -179,7 +185,7 @@ public class AllService {
     return inventories.stream().mapToInt(Inventory::getQuantity).sum();
     }
     @Transactional
-    public Order createPurchaseOrder(List<Order.ProductDetails> productCatalog) {
+    public ResponseEntity<?> createPurchaseOrder(List<Order.ProductDetails> productCatalog) {
         double totalPrice=0.0;
         List<Inventory> updatedInventories = new ArrayList<>();
         for(Order.ProductDetails productDetails: productCatalog){
@@ -193,15 +199,16 @@ public class AllService {
                     Inventory newInventory = new Inventory(product.getId(), productDetails.getQuantity(),0);
                     updatedInventories.add(newInventory);
                 }
+                //Save
                 totalPrice += (productDetails.getPrice()>0
                         ? productDetails.getPrice():product.getPrice())* productDetails.getQuantity();
             }else{
-                return null;
+                return new ResponseEntity<>(productDetails.getProductId() + " Product ID not Found", HttpStatus.BAD_REQUEST);
             }
         }
         inventoryRepo.saveAll(updatedInventories);
         Order order= new Order(productCatalog, Order.OrderType.PURCHASE_ORDER, totalPrice);
-        return orderRepo.save(order);
+        return new ResponseEntity<>(orderRepo.save(order), HttpStatus.CREATED);
     }
 
     private Inventory findFirstInventory(String productId) {

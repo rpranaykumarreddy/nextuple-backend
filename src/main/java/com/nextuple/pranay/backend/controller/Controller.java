@@ -19,7 +19,7 @@ public class Controller {
     * Product Alone
     */
     @PostMapping("/create-product")
-    public Product createProduct(@RequestBody Product product){
+    public ResponseEntity<Product> createProduct(@RequestBody Product product){
         return service.createProduct(product);
     }
     @GetMapping("/product/{productId}")
@@ -27,13 +27,8 @@ public class Controller {
         return service.findProductById(productId);
     }
     @PutMapping("/product/{productId}")
-    public ResponseEntity<Product> updateProductById(@PathVariable String productId,@RequestBody Product productChanges){
-        Product updatedProduct = service.updateProductById(productId, productChanges);
-        if(updatedProduct !=null){
-            return new ResponseEntity<>(updatedProduct, HttpStatus.OK);
-        }else{
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
+    public ResponseEntity<?> updateProductById(@PathVariable String productId,@RequestBody Product productChanges){
+        return service.updateProductById(productId, productChanges);
     }
     @DeleteMapping("/product/{productId}")
     public boolean deleteProductById(@PathVariable String productId){
@@ -82,11 +77,11 @@ public class Controller {
      * Order
      */
     @PostMapping("/create-sale-order")
-    public Order createSaleOrder(@RequestBody Order productCatalog){
+    public ResponseEntity<?> createSaleOrder(@RequestBody Order productCatalog){
         return service.createSaleOrder(productCatalog.getProductCatalog());
     }
     @PostMapping("/create-purchase-order")
-    public Order createPurchaseOrder(@RequestBody Order productCatalog){
+    public ResponseEntity<?> createPurchaseOrder(@RequestBody Order productCatalog){
         return service.createPurchaseOrder(productCatalog.getProductCatalog());
     }
     @GetMapping("/order-list")
