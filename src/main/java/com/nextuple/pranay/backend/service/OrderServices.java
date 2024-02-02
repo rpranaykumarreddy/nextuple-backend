@@ -29,7 +29,41 @@ public class OrderServices {
     InventoryServices inventoryServices;
     private static final Logger logger = LoggerFactory.getLogger(OrderServices.class);
 
-    //FIXME: You should replace the repo with serivce
+    @Transactional
+    public ResponseEntity<Order> createPurchaseOrder(List<Order.ProductDetails> productCatalog) {
+        double totalPrice=0.0;
+        List<Inventory> updatedInventories = new ArrayList<>();
+        for(Order.ProductDetails productDetails: productCatalog){
+            Product product=productServices.findProductById(productDetails.getProductId());
+            if(product!=null){
+                Inventory firstInventory = findFirstInventory(product.getId());
+                if(firstInventory!=null){
+                    firstInventory.setQuantity(firstInventory.getQuantity() + productDetails.getQuantity());
+                    updatedInventories.add(firstInventory);
+                }else{
+                    Inventory newInventory = new Inventory(product.getId(), productDetails.getQuantity(),0);
+                    updatedInventories.add(newInventory);
+                }
+                totalPrice += (productDetails.getPrice()>0
+                        ? productDetails.getPrice():product.getPrice())* productDetails.getQuantity();
+            }else{
+                throw new CustomException.ProductNotFoundException("Product ID:" + productDetails.getProductId());
+            }
+        }
+        inventoryServices.updateInventories(updatedInventories);
+        try {
+            Order order= new Order(productCatalog, Order.OrderType.PURCHASE_ORDER, totalPrice);
+            return new ResponseEntity<>(orderRepo.save(order), HttpStatus.CREATED);
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+            throw new CustomException.SaveNotSuccessfulException("Order Not Saved");
+        }
+    }
+
+    public Inventory findFirstInventory(String productId) {
+        List<Inventory> inventories = inventoryServices.findInventoryByProductId(productId).getBody();
+        return inventories.isEmpty() ? null : inventories.getFirst();
+    }
     @Transactional
     public ResponseEntity<Order> createSaleOrder(List<Order.ProductDetails> productCatalog) {
         double totalPrice=0.0;
@@ -91,41 +125,6 @@ public class OrderServices {
     private int getAvailableQuantityInInventory(String productId) {
         List<Inventory> inventories = inventoryServices.findInventoryByProductId(productId).getBody();
         return inventories.stream().mapToInt(Inventory::getQuantity).sum();
-    }
-    @Transactional
-    public ResponseEntity<Order> createPurchaseOrder(List<Order.ProductDetails> productCatalog) {
-        double totalPrice=0.0;
-        List<Inventory> updatedInventories = new ArrayList<>();
-        for(Order.ProductDetails productDetails: productCatalog){
-            Product product=productServices.findProductById(productDetails.getProductId());
-            if(product!=null){
-                Inventory firstInventory = findFirstInventory(product.getId());
-                if(firstInventory!=null){
-                    firstInventory.setQuantity(firstInventory.getQuantity() + productDetails.getQuantity());
-                    updatedInventories.add(firstInventory);
-                }else{
-                    Inventory newInventory = new Inventory(product.getId(), productDetails.getQuantity(),0);
-                    updatedInventories.add(newInventory);
-                }
-                totalPrice += (productDetails.getPrice()>0
-                        ? productDetails.getPrice():product.getPrice())* productDetails.getQuantity();
-            }else{
-                throw new CustomException.ProductNotFoundException("Product ID:" + productDetails.getProductId());
-            }
-        }
-        inventoryServices.updateInventories(updatedInventories);
-        try {
-            Order order= new Order(productCatalog, Order.OrderType.PURCHASE_ORDER, totalPrice);
-            return new ResponseEntity<>(orderRepo.save(order), HttpStatus.CREATED);
-        } catch (Exception e) {
-            logger.error(e.getMessage());
-            throw new CustomException.SaveNotSuccessfulException("Order Not Saved");
-        }
-    }
-
-    private Inventory findFirstInventory(String productId) {
-        List<Inventory> inventories = inventoryServices.findInventoryByProductId(productId).getBody();
-        return inventories.isEmpty() ? null : inventories.getFirst();
     }
 
     public ResponseEntity<List<Order>> listAllOrders() {

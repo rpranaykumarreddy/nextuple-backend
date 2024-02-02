@@ -25,6 +25,10 @@ public class Order {
         updateTimeStamp();
     }
 
+    public void setId(String order1Id) {
+        this.id = order1Id;
+    }
+
     public enum OrderType{SALE_ORDER, PURCHASE_ORDER}
 
     public Order(List<ProductDetails> productCatalog, OrderType type, double totalPrice) {

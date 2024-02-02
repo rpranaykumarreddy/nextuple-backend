@@ -25,6 +25,7 @@ public class InventoryServices {
             Inventory save = inventoryRepo.save(inventory);
             return new  ResponseEntity<>(save, HttpStatus.OK);
         }catch (Exception e){
+            logger.error(e.getMessage());
             throw new CustomException.SaveNotSuccessfulException("Inventory Not Saved");
         }
     }
@@ -43,6 +44,7 @@ public class InventoryServices {
             List<Inventory> allByProductId = inventoryRepo.findAllByProductId(productId);
             return new ResponseEntity<>(allByProductId, HttpStatus.OK);
         }catch (Exception e){
+            logger.error(e.getMessage());
             throw new CustomException.InventoryNotFoundException("Inventory Not Found");
         }
     }
@@ -60,6 +62,7 @@ public class InventoryServices {
                 Inventory save = inventoryRepo.save(presentInventory);
                 return new ResponseEntity<>(save, HttpStatus.OK);
             }catch (Exception e){
+                logger.error(e.getMessage());
                 throw new CustomException.SaveNotSuccessfulException("Inventory Not Saved");
             }
         }else{
@@ -74,6 +77,7 @@ public class InventoryServices {
                 inventoryRepo.deleteById(inventoryId);
                 return new ResponseEntity<>(true, HttpStatus.OK);
             }catch (Exception e){
+                logger.error(e.getMessage());
                 throw new CustomException.SaveNotSuccessfulException("Inventory Not Deleted");
             }
         }else{
@@ -89,16 +93,21 @@ public class InventoryServices {
             }
             return new ResponseEntity<> (all, HttpStatus.OK);
         }catch (Exception e){
+            logger.error(e.getMessage());
             throw new CustomException.InventoryNotFoundException("Inventory Not Found");
         }
     }
 
     public ResponseEntity<Boolean> updateInventories(List<Inventory> updatedInventories) {
         try {
+            logger.warn("Enrty");
             inventoryRepo.saveAll(updatedInventories);
+            logger.warn("Exit");
             return new ResponseEntity<>(true, HttpStatus.OK);
         } catch (Exception e) {
+            logger.warn(e.getMessage());
             throw new CustomException.SaveNotSuccessfulException("Inventory Not Saved");
+
         }
     }
 }
