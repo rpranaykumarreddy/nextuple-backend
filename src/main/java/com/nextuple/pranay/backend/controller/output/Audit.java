@@ -92,14 +92,20 @@ public class Audit {
         private double totalIncome;
         private List<ProductSales> productDetails;
 
-        public Sales(long orderCount, long uniqueProductCount, long totalItemCount, double totalIncome, List<ProductSales> productDetails) {
+        public Sales(long orderCount,  long totalItemCount, double totalIncome, List<ProductSales> productDetails) {
             this.orderCount = orderCount;
-            this.uniqueProductCount = uniqueProductCount;
             this.totalItemCount = totalItemCount;
             this.totalIncome = totalIncome;
             this.productDetails = productDetails;
+            updateUniqueProductCount();
+            sortProductDetailsByItemCount();
         }
-
+        public void updateUniqueProductCount(){
+            this.uniqueProductCount = this.productDetails.size();
+        }
+        public void sortProductDetailsByItemCount(){
+            this.productDetails.sort((o1, o2) -> (int) (o2.getItemCount() - o1.getItemCount()));
+        }
         public long getOrderCount() {
             return orderCount;
         }
@@ -113,7 +119,7 @@ public class Audit {
         }
 
         public void setUniqueProductCount(long uniqueProductCount) {
-            this.uniqueProductCount = uniqueProductCount;
+            updateUniqueProductCount();
         }
 
         public long getTotalItemCount() {
@@ -138,6 +144,8 @@ public class Audit {
 
         public void setProductDetails(List<ProductSales> productDetails) {
             this.productDetails = productDetails;
+            updateUniqueProductCount();
+            sortProductDetailsByItemCount();
         }
 
         public static class ProductSales{
@@ -231,7 +239,7 @@ public class Audit {
         }
 
         public void setUniqueProductCount(long uniqueProductCount) {
-            this.uniqueProductCount = uniqueProductCount;
+            updateUniqueProductCount();
         }
 
         public long getTotalItemCount() {
@@ -256,16 +264,24 @@ public class Audit {
 
         public void setProductDetails(List<ProductPurchase> productDetails) {
             this.productDetails = productDetails;
+            updateUniqueProductCount();
+            sortProductDetailsByItemCount();
         }
 
-        public Purchase(long orderCount, long uniqueProductCount, long totalItemCount, double totalExpenditure, List<ProductPurchase> productDetails) {
+        public Purchase(long orderCount,  long totalItemCount, double totalExpenditure, List<ProductPurchase> productDetails) {
             this.orderCount = orderCount;
-            this.uniqueProductCount = uniqueProductCount;
             this.totalItemCount = totalItemCount;
             this.totalExpenditure = totalExpenditure;
             this.productDetails = productDetails;
+            updateUniqueProductCount();
+            sortProductDetailsByItemCount();
         }
-
+        public void updateUniqueProductCount(){
+            this.uniqueProductCount = this.productDetails.size();
+        }
+        public void sortProductDetailsByItemCount(){
+            this.productDetails.sort((o1, o2) -> (int) (o2.getItemCount() - o1.getItemCount()));
+        }
         public static class ProductPurchase{
             private String productId;
             private String productName;
@@ -419,6 +435,9 @@ public class Audit {
 
         public ProductWithoutInventory(List<ProductDetails> productDetails) {
             this.productDetails = productDetails;
+            updateCountOfProduct();
+        }
+        public void updateCountOfProduct(){
             this.countOfProduct = productDetails.size();
         }
 
@@ -427,7 +446,7 @@ public class Audit {
         }
 
         public void setCountOfProduct(long countOfProduct) {
-            this.countOfProduct = countOfProduct;
+            updateCountOfProduct();
         }
 
         public List<ProductDetails> getProductDetails() {
@@ -436,6 +455,7 @@ public class Audit {
 
         public void setProductDetails(List<ProductDetails> productDetails) {
             this.productDetails = productDetails;
+            updateCountOfProduct();
         }
 
         public static class ProductDetails {
@@ -478,14 +498,13 @@ public class Audit {
     Products with stock less than safe quantity
         -> countOfProduct
         -> totalExpenditureNeeded
-        -> ProductDetails
+        -> ProductDetails (sort by expenditureNeeded)
             -> productId
             -> productName
             -> currentStock
             -> safeQuantity
             -> stockNeeded
             -> expenditureNeeded
-            -> profitRank
      */
     public static class ProductWithStockLessThanSafeQuantity {
         private long countOfProduct;
@@ -494,8 +513,12 @@ public class Audit {
 
         public ProductWithStockLessThanSafeQuantity( List<ProductDetails> productDetails) {
             this.productDetails = productDetails;
+            updateStats();
+        }
+        public void updateStats(){
             this.countOfProduct = productDetails.size();
             this.totalExpenditureNeeded = productDetails.stream().mapToDouble(ProductDetails::getExpenditureNeeded).sum();
+            this.productDetails.sort((o1, o2) -> (int) (o2.getExpenditureNeeded() - o1.getExpenditureNeeded()));
         }
 
         public long getCountOfProduct() {
@@ -503,7 +526,7 @@ public class Audit {
         }
 
         public void setCountOfProduct(long countOfProduct) {
-            this.countOfProduct = countOfProduct;
+            updateStats();
         }
 
         public double getTotalExpenditureNeeded() {
@@ -511,7 +534,7 @@ public class Audit {
         }
 
         public void setTotalExpenditureNeeded(double totalExpenditureNeeded) {
-            this.totalExpenditureNeeded = totalExpenditureNeeded;
+            updateStats();
         }
 
         public List<ProductDetails> getProductDetails() {
@@ -520,6 +543,7 @@ public class Audit {
 
         public void setProductDetails(List<ProductDetails> productDetails) {
             this.productDetails = productDetails;
+            updateStats();
         }
 
         public static class ProductDetails {
@@ -589,4 +613,5 @@ public class Audit {
             }
         }
     }
+
 }
