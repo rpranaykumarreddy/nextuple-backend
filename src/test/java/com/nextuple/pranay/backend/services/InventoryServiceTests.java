@@ -33,7 +33,7 @@ public class InventoryServiceTests {
 
     @Test
     public void testCreateInventory_Success() {
-        Inventory inventory = TestUtil.InventoryTestData.getInventory1Request();
+        Inventory inventory = TestUtil.InventoryTestData.Inventory1Request;
         when(inventoryRepo.save(inventory)).thenReturn(TestUtil.InventoryTestData.getInventory1Response());
         ResponseEntity<Inventory> responseEntity = inventoryServices.createInventory(inventory);
         assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
@@ -42,7 +42,7 @@ assertEquals(TestUtil.InventoryTestData.INVENTORY1_PRODUCT_ID, responseEntity.ge
     }
     @Test
     public void testCreateInventory_SaveNotSuccessfulException() {
-        Inventory inventory = TestUtil.InventoryTestData.getInventory1Request();
+        Inventory inventory = TestUtil.InventoryTestData.Inventory1Request;
         when(inventoryRepo.save(inventory)).thenThrow(new RuntimeException("A database error"));
         assertThrows(CustomException.SaveNotSuccessfulException.class, () -> {
             inventoryServices.createInventory(inventory);
@@ -72,17 +72,10 @@ assertEquals(TestUtil.InventoryTestData.INVENTORY1_PRODUCT_ID, responseEntity.ge
         verify(logger, never()).error(anyString());
     }
     @Test
-    public void testFindInventoryByProductId_InventoryNotFoundException() {
-        when(inventoryRepo.findAllByProductId(TestUtil.InventoryTestData.INVENTORY1_PRODUCT_ID)).thenThrow(new RuntimeException("A database error"));
-        assertThrows(CustomException.InventoryNotFoundException.class, () -> {
-            inventoryServices.findInventoryByProductId(TestUtil.InventoryTestData.INVENTORY1_PRODUCT_ID);
-        });
-    }
-    @Test
     public void testUpdateInventoryById_Success() {
         when(inventoryRepo.findById(TestUtil.InventoryTestData.INVENTORY1_ID)).thenReturn(java.util.Optional.of(TestUtil.InventoryTestData.getInventory1Response()));
         when(inventoryRepo.save(any(Inventory.class))).thenReturn(TestUtil.InventoryTestData.getInventory1ResponseOp1());
-        ResponseEntity<Inventory> responseEntity = inventoryServices.updateInventoryById(TestUtil.InventoryTestData.INVENTORY1_ID, TestUtil.InventoryTestData.getInventory1RequestOp1());
+        ResponseEntity<Inventory> responseEntity = inventoryServices.updateInventoryById(TestUtil.InventoryTestData.INVENTORY1_ID, TestUtil.InventoryTestData.Inventory1RequestOp1);
         assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
         assertEquals(TestUtil.InventoryTestData.INVENTORY1_OP1_QUANTITY, responseEntity.getBody().getQuantity());
         verify(logger, never()).error(anyString());
@@ -91,7 +84,7 @@ assertEquals(TestUtil.InventoryTestData.INVENTORY1_PRODUCT_ID, responseEntity.ge
     public void testUpdateInventoryById_InventoryNotFoundException() {
         when(inventoryRepo.findById(TestUtil.InventoryTestData.INVENTORY1_ID)).thenReturn(java.util.Optional.empty());
         assertThrows(CustomException.InventoryNotFoundException.class, () -> {
-            inventoryServices.updateInventoryById(TestUtil.InventoryTestData.INVENTORY1_ID, TestUtil.InventoryTestData.getInventory1RequestOp1());
+            inventoryServices.updateInventoryById(TestUtil.InventoryTestData.INVENTORY1_ID, TestUtil.InventoryTestData.Inventory1RequestOp1);
         });
     }
     @Test
@@ -99,7 +92,7 @@ assertEquals(TestUtil.InventoryTestData.INVENTORY1_PRODUCT_ID, responseEntity.ge
         when(inventoryRepo.findById(TestUtil.InventoryTestData.INVENTORY1_ID)).thenReturn(java.util.Optional.of(TestUtil.InventoryTestData.getInventory1Response()));
         when(inventoryRepo.save(any(Inventory.class))).thenThrow(new RuntimeException("A database error"));
         assertThrows(CustomException.SaveNotSuccessfulException.class, () -> {
-            inventoryServices.updateInventoryById(TestUtil.InventoryTestData.INVENTORY1_ID, TestUtil.InventoryTestData.getInventory1RequestOp1());
+            inventoryServices.updateInventoryById(TestUtil.InventoryTestData.INVENTORY1_ID, TestUtil.InventoryTestData.Inventory1RequestOp1);
         });
     }
     @Test
@@ -132,13 +125,6 @@ assertEquals(TestUtil.InventoryTestData.INVENTORY1_PRODUCT_ID, responseEntity.ge
         ResponseEntity responseEntity = inventoryServices.listAllInventory();
         assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
         verify(logger, never()).error(anyString());
-    }
-    @Test
-    public void testListAllInventory_InventoryNotFoundException() {
-        when(inventoryRepo.findAll()).thenThrow(new RuntimeException("A database error"));
-        assertThrows(CustomException.InventoryNotFoundException.class, () -> {
-            inventoryServices.listAllInventory();
-        });
     }
     @Test
     public void testListAllInventory_EmptyList() {

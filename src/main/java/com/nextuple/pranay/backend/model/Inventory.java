@@ -3,6 +3,7 @@ package com.nextuple.pranay.backend.model;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.http.HttpStatusCode;
 
 import java.time.LocalDateTime;
 
@@ -66,6 +67,17 @@ public class Inventory {
     }
     public void updateTimeStamp() {
         this.lastTime = LocalDateTime.now();
+    }
+
+    @Override
+    public String toString() {
+        return "Inventory{" +
+                "id='" + id + '\'' +
+                ", productId='" + productId + '\'' +
+                ", quantity=" + quantity +
+                ", safeQuantity=" + safeQuantity +
+                ", lastTime=" + lastTime +
+                '}';
     }
 
 }

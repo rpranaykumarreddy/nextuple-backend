@@ -72,6 +72,14 @@ public class Order {
         public void setPrice(double price) {
             this.price = price;
         }
+        @Override
+        public String toString() {
+            return "ProductDetails{" +
+                    "productId='" + productId + '\'' +
+                    ", quantity=" + quantity +
+                    ", price=" + price +
+                    '}';
+        }
     }
 
     public String getId() {
@@ -108,5 +116,15 @@ public class Order {
         this.lastTime = LocalDateTime.now();
     }
 
+    @Override
+    public String toString() {
+        return "Order{" +
+                "id='" + id + '\'' +
+                ", type=" + type +
+                ", productCatalog=" + productCatalog +
+                ", totalPrice=" + totalPrice +
+                ", lastTime=" + lastTime +
+                '}';
+    }
 }
 

@@ -1,5 +1,6 @@
 package com.nextuple.pranay.backend.model;
 
+import com.nextuple.pranay.backend.exception.CustomException;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -71,4 +72,15 @@ public class Product {
     public String getId() {
         return id;
     }
+    @Override
+    public String toString() {
+        return "Product{" +
+                "id='" + id + '\'' +
+                ", name='" + name + '\'' +
+                ", price=" + price +
+                ", category='" + category + '\'' +
+                ", lastTime=" + lastTime +
+                '}';
+    }
+
 }

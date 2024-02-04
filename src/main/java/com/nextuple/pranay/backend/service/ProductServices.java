@@ -79,13 +79,11 @@ public class ProductServices {
     }
 
     public ResponseEntity<List<Product>> listAllProducts(){
-        try {
             List<Product> allProducts = productRepo.findAll();
+            if(allProducts.isEmpty()){
+                throw new CustomException.ProductNotFoundException("No Products Found");
+            }
             return new ResponseEntity<>(allProducts, HttpStatus.OK);
-        }catch (Exception e){
-            logger.error(e.getMessage());
-            throw new CustomException.ProductNotFoundException("Products Not Saved");
-        }
     }
 
 }

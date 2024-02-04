@@ -20,13 +20,18 @@ public class InventoryServices {
     private static final Logger logger = LoggerFactory.getLogger(InventoryServices.class);
 
     public ResponseEntity<Inventory> createInventory(Inventory inventory) {
+
+        List<Inventory> byProductId = inventoryRepo.findAllByProductId(inventory.getProductId());
+        if(!byProductId.isEmpty()){
+            throw new CustomException.InventoryAlreadyExistsException("Inventory Already Exists for Product ID: "+inventory.getProductId());
+        }
         try{
             inventory.updateTimeStamp();
             Inventory save = inventoryRepo.save(inventory);
             return new  ResponseEntity<>(save, HttpStatus.OK);
         }catch (Exception e){
             logger.error(e.getMessage());
-            throw new CustomException.SaveNotSuccessfulException("Inventory Not Saved");
+            throw new CustomException.SaveNotSuccessfulException("Inventory Not Created");
         }
     }
 
@@ -35,18 +40,16 @@ public class InventoryServices {
         if(inventory.isPresent()){
             return new ResponseEntity<>(inventory.get(), HttpStatus.OK);
         }else{
-            throw new CustomException.InventoryNotFoundException("Inventory Not Found");
+            throw new CustomException.InventoryNotFoundException("Inventory Not Found for ID: "+inventoryId);
         }
     }
 
-    public ResponseEntity<List<Inventory>> findInventoryByProductId(String productId)  {
-        try{
-            List<Inventory> allByProductId = inventoryRepo.findAllByProductId(productId);
-            return new ResponseEntity<>(allByProductId, HttpStatus.OK);
-        }catch (Exception e){
-            logger.error(e.getMessage());
-            throw new CustomException.InventoryNotFoundException("Inventory Not Found");
+    public ResponseEntity<Inventory> findInventoryByProductId(String productId)  {
+        List<Inventory> allByProductId = inventoryRepo.findAllByProductId(productId);
+        if(allByProductId.isEmpty()){
+            throw new CustomException.InventoryNotFoundException("Inventory Not Found for Product ID: "+productId);
         }
+        return new ResponseEntity<>(allByProductId.getFirst(), HttpStatus.OK);
     }
     public ResponseEntity<Inventory> updateInventoryById(String inventoryId, Inventory inventoryChanges)  {
         Optional<Inventory> optionalInventory = inventoryRepo.findById(inventoryId);
@@ -63,10 +66,10 @@ public class InventoryServices {
                 return new ResponseEntity<>(save, HttpStatus.OK);
             }catch (Exception e){
                 logger.error(e.getMessage());
-                throw new CustomException.SaveNotSuccessfulException("Inventory Not Saved");
+                throw new CustomException.SaveNotSuccessfulException("Inventory Not Updated for ID: "+inventoryId);
             }
         }else{
-            throw new CustomException.InventoryNotFoundException("Inventory Not Found");
+            throw new CustomException.InventoryNotFoundException("Inventory Not Found for ID: "+inventoryId);
         }
     }
 
@@ -78,36 +81,28 @@ public class InventoryServices {
                 return new ResponseEntity<>(true, HttpStatus.OK);
             }catch (Exception e){
                 logger.error(e.getMessage());
-                throw new CustomException.SaveNotSuccessfulException("Inventory Not Deleted");
+                throw new CustomException.SaveNotSuccessfulException("Inventory Not Deleted for ID: "+inventoryId);
             }
         }else{
-            throw new CustomException.InventoryNotFoundException("Inventory Not Found");
+            throw new CustomException.InventoryNotFoundException("Inventory Not Found for ID: "+inventoryId);
         }
     }
 
     public ResponseEntity<List<Inventory>> listAllInventory() {
-        try{
-            List<Inventory> all = inventoryRepo.findAll();
-            if(all.isEmpty()){
-                throw new CustomException.InventoryNotFoundException("Inventory Not Found");
-            }
-            return new ResponseEntity<> (all, HttpStatus.OK);
-        }catch (Exception e){
-            logger.error(e.getMessage());
-            throw new CustomException.InventoryNotFoundException("Inventory Not Found");
+        List<Inventory> all = inventoryRepo.findAll();
+        if(all.isEmpty()){
+            throw new CustomException.InventoryNotFoundException("No Inventory Found");
         }
+        return new ResponseEntity<> (all, HttpStatus.OK);
     }
 
     public ResponseEntity<Boolean> updateInventories(List<Inventory> updatedInventories) {
         try {
-            logger.warn("Enrty");
             inventoryRepo.saveAll(updatedInventories);
-            logger.warn("Exit");
             return new ResponseEntity<>(true, HttpStatus.OK);
         } catch (Exception e) {
             logger.warn(e.getMessage());
-            throw new CustomException.SaveNotSuccessfulException("Inventory Not Saved");
-
+            throw new CustomException.SaveNotSuccessfulException("Unable to update Inventories for Order");
         }
     }
 }

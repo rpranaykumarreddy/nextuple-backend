@@ -121,7 +121,7 @@ public class ProductServiceTests {
     }
     @Test
     public void testListAllProducts_ProductNotFoundException() {
-        when(productRepo.findAll()).thenThrow(new RuntimeException("A database error"));
+        when(productRepo.findAll()).thenReturn(TestUtil.ProductTestData.getEmptyProductList());
         assertThrows(CustomException.ProductNotFoundException.class, () -> {
             productServices.listAllProducts();
         });

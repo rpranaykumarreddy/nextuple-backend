@@ -1,5 +1,6 @@
 package com.nextuple.pranay.backend.service;
 
+import com.nextuple.pranay.backend.controller.input.ProductsCatalog;
 import com.nextuple.pranay.backend.exception.CustomException;
 import com.nextuple.pranay.backend.model.Inventory;
 import com.nextuple.pranay.backend.model.Order;
@@ -30,18 +31,25 @@ public class OrderServices {
     private static final Logger logger = LoggerFactory.getLogger(OrderServices.class);
 
     @Transactional
-    public ResponseEntity<Order> createPurchaseOrder(List<Order.ProductDetails> productCatalog) {
+    public ResponseEntity<Order> createPurchaseOrder(ProductsCatalog productCatalog) {
         double totalPrice=0.0;
         List<Inventory> updatedInventories = new ArrayList<>();
-        for(Order.ProductDetails productDetails: productCatalog){
+        List <Order.ProductDetails> productDetailsList = new ArrayList<>();
+        List<ProductsCatalog.ProductData> productCatalogProducts = productCatalog.getProducts();
+        for(ProductsCatalog.ProductData productDetails: productCatalogProducts){
             Product product=productServices.findProductById(productDetails.getProductId());
             if(product!=null){
-                Inventory firstInventory = findFirstInventory(product.getId());
-                if(firstInventory!=null){
+                if(productDetails.getQuantity()<=0){
+                    throw new CustomException.QuantityIsZeroOrNegativeException("Product ID:" + productDetails.getProductId());
+                }
+                try{
+                    Inventory firstInventory = inventoryServices.findInventoryByProductId(productDetails.getProductId()).getBody();
                     firstInventory.setQuantity(firstInventory.getQuantity() + productDetails.getQuantity());
+                    if(productDetails.getSafeQuantity()>0)
+                        firstInventory.setSafeQuantity(productDetails.getSafeQuantity());
                     updatedInventories.add(firstInventory);
-                }else{
-                    Inventory newInventory = new Inventory(product.getId(), productDetails.getQuantity(),0);
+                }catch (CustomException.InventoryNotFoundException e){
+                    Inventory newInventory = new Inventory(product.getId(), productDetails.getQuantity(), productDetails.getSafeQuantity());
                     updatedInventories.add(newInventory);
                 }
                 totalPrice += (productDetails.getPrice()>0
@@ -49,82 +57,64 @@ public class OrderServices {
             }else{
                 throw new CustomException.ProductNotFoundException("Product ID:" + productDetails.getProductId());
             }
+            productDetailsList.add(productDetails.toProductDetails());
+        }
+        if(productDetailsList.isEmpty()){
+            throw new CustomException.ProductCatalogNotFoundExpception("Product Catalog is Empty");
         }
         inventoryServices.updateInventories(updatedInventories);
         try {
-            Order order= new Order(productCatalog, Order.OrderType.PURCHASE_ORDER, totalPrice);
+            Order order= new Order(productDetailsList, Order.OrderType.PURCHASE_ORDER, totalPrice);
             return new ResponseEntity<>(orderRepo.save(order), HttpStatus.CREATED);
         } catch (Exception e) {
             logger.error(e.getMessage());
-            throw new CustomException.SaveNotSuccessfulException("Order Not Saved");
+            throw new CustomException.SaveNotSuccessfulException("Order Not Saved for Purchase Order");
         }
     }
 
-    public Inventory findFirstInventory(String productId) {
-        List<Inventory> inventories = inventoryServices.findInventoryByProductId(productId).getBody();
-        return inventories.isEmpty() ? null : inventories.getFirst();
-    }
     @Transactional
-    public ResponseEntity<Order> createSaleOrder(List<Order.ProductDetails> productCatalog) {
+    public ResponseEntity<Order> createSaleOrder(ProductsCatalog productCatalog) {
         double totalPrice=0.0;
         List<Inventory> updatedInventories = new ArrayList<>();
-        for(Order.ProductDetails productDetails: productCatalog){
+        List <Order.ProductDetails> productDetailsList = new ArrayList<>();
+        List<ProductsCatalog.ProductData> productCatalogProducts = productCatalog.getProducts();
+        for(ProductsCatalog.ProductData productDetails: productCatalogProducts){
             Product product= productServices.findProductById(productDetails.getProductId());
             if(product!=null){
-                int requestedQuantity = productDetails.getQuantity();
-                int availableQuantity = getAvailableQuantityInInventory(product.getId());
-                if(availableQuantity>=requestedQuantity){
-                    List<Inventory> updatedInventory= deductFromInventory(product.getId(),requestedQuantity);
-                    if(updatedInventory ==null) {
+                if(productDetails.getQuantity()<=0){
+                    throw new CustomException.QuantityIsZeroOrNegativeException("Product ID:" + productDetails.getProductId());
+                }
+                Inventory firstInventory = inventoryServices.findInventoryByProductId(productDetails.getProductId()).getBody();
+                if(firstInventory!=null){
+                    if(firstInventory.getQuantity()>=productDetails.getQuantity()){
+                        firstInventory.setQuantity(firstInventory.getQuantity() - productDetails.getQuantity());
+                        updatedInventories.add(firstInventory);
+                    }else{
                         throw new CustomException.QuantityNotAvailableException("Product ID:" + productDetails.getProductId());
                     }
-                    totalPrice += (productDetails.getPrice()>0
-                            ? productDetails.getPrice() : product.getPrice())* requestedQuantity;
-                    if(productDetails.getPrice()<=0)
-                        productDetails.setPrice(product.getPrice());
-                    updatedInventories.addAll(updatedInventory);
-                } else{
-                    throw new CustomException.QuantityNotAvailableException("Product ID:" + productDetails.getProductId());
+                }else{
+                    throw new CustomException.InventoryNotFoundException("Inventory Not Found for Product ID:" + productDetails.getProductId());
                 }
+                totalPrice += (productDetails.getPrice()>0
+                        ? productDetails.getPrice() : product.getPrice())* productDetails.getQuantity();
+                if(productDetails.getPrice()<=0)
+                    productDetails.setPrice(product.getPrice());
             }else{
                 throw new CustomException.ProductNotFoundException("Product ID:" + productDetails.getProductId());
             }
+            productDetailsList.add(productDetails.toProductDetails());
+        }
+        if(productDetailsList.isEmpty()){
+            throw new CustomException.ProductCatalogNotFoundExpception("Product Catalog is Empty");
         }
         inventoryServices.updateInventories(updatedInventories);
         try {
-            Order order= new Order(productCatalog, Order.OrderType.SALE_ORDER, totalPrice);
+            Order order= new Order(productDetailsList, Order.OrderType.SALE_ORDER, totalPrice);
             return new ResponseEntity<>(orderRepo.save(order), HttpStatus.CREATED);
         } catch (Exception e) {
             logger.error(e.getMessage());
             throw new CustomException.SaveNotSuccessfulException("Order Not Saved");
         }
-    }
-
-    private List<Inventory> deductFromInventory(String productId, int requestedQuantity) {
-        List<Inventory> inventories = inventoryServices.findInventoryByProductId(productId).getBody();
-        int remainingQuantity = requestedQuantity;
-        List<Inventory> updatedInventories = new ArrayList<>();
-        for(Inventory inventory: inventories){
-            int availableQuantity = inventory.getQuantity();
-            if(availableQuantity >= remainingQuantity){
-                inventory.setQuantity(availableQuantity - remainingQuantity);
-                updatedInventories.add(inventory);
-                return updatedInventories;
-            }else{
-                remainingQuantity -= availableQuantity;
-                inventory.setQuantity(0);
-                updatedInventories.add(inventory);
-            }
-        }
-        if(remainingQuantity>0){
-            return null;
-        }
-        return updatedInventories;
-    }
-
-    private int getAvailableQuantityInInventory(String productId) {
-        List<Inventory> inventories = inventoryServices.findInventoryByProductId(productId).getBody();
-        return inventories.stream().mapToInt(Inventory::getQuantity).sum();
     }
 
     public ResponseEntity<List<Order>> listAllOrders() {

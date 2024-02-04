@@ -1,5 +1,6 @@
 package com.nextuple.pranay.backend.controller;
 
+import com.nextuple.pranay.backend.controller.validator.InputValidator;
 import com.nextuple.pranay.backend.exception.CustomException;
 import com.nextuple.pranay.backend.model.Inventory;
 import com.nextuple.pranay.backend.service.InventoryServices;
@@ -20,23 +21,28 @@ public class InventoryController {
 
     @PostMapping("/create")
     public ResponseEntity<Inventory> createInventory(@RequestBody Inventory inventory){
+        InputValidator.Inventory.createInventory(inventory);
         return inventoryServices.createInventory(inventory);
     }
 
     @GetMapping("/{inventoryId}")
     public ResponseEntity<Inventory> findInventoryById(@PathVariable String inventoryId)  {
+        InputValidator.Inventory.findInventoryById(inventoryId);
         return inventoryServices.findInventoryById(inventoryId);
     }
     @GetMapping("/product/{productId}")
-    public ResponseEntity<List<Inventory>> findInventoryByProductId(@PathVariable String productId)  {
+    public ResponseEntity<Inventory> findInventoryByProductId(@PathVariable String productId)  {
+        InputValidator.Inventory.findInventoryByProductId(productId);
         return inventoryServices.findInventoryByProductId(productId);
     }
     @PutMapping("/{inventoryId}")
     public ResponseEntity<Inventory> updateInventoryById(@PathVariable String inventoryId, @RequestBody Inventory InventoryChanges)  {
+        InputValidator.Inventory.updateInventoryById(inventoryId, InventoryChanges);
         return inventoryServices.updateInventoryById(inventoryId, InventoryChanges);
     }
     @DeleteMapping("/{inventoryId}")
     public ResponseEntity<Boolean> deleteInventoryById(@PathVariable String inventoryId)  {
+        InputValidator.Inventory.deleteInventoryById(inventoryId);
         return inventoryServices.deleteInventoryById(inventoryId);
     }
     @GetMapping("/list")
