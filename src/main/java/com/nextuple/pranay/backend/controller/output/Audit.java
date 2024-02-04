@@ -92,9 +92,9 @@ public class Audit {
         private double totalIncome;
         private List<ProductSales> productDetails;
 
-        public Sales(long orderCount, long uniqueProductCount, long totalItemCount, double totalIncome, List<ProductSales> productDetails) {
+        public Sales(long orderCount,  long totalItemCount, double totalIncome, List<ProductSales> productDetails) {
             this.orderCount = orderCount;
-            this.uniqueProductCount = uniqueProductCount;
+            this.uniqueProductCount = productDetails.size();
             this.totalItemCount = totalItemCount;
             this.totalIncome = totalIncome;
             this.productDetails = productDetails;
@@ -258,9 +258,9 @@ public class Audit {
             this.productDetails = productDetails;
         }
 
-        public Purchase(long orderCount, long uniqueProductCount, long totalItemCount, double totalExpenditure, List<ProductPurchase> productDetails) {
+        public Purchase(long orderCount,  long totalItemCount, double totalExpenditure, List<ProductPurchase> productDetails) {
             this.orderCount = orderCount;
-            this.uniqueProductCount = uniqueProductCount;
+            this.uniqueProductCount = productDetails.size();
             this.totalItemCount = totalItemCount;
             this.totalExpenditure = totalExpenditure;
             this.productDetails = productDetails;
@@ -589,4 +589,5 @@ public class Audit {
             }
         }
     }
+
 }

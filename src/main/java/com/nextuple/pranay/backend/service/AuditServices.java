@@ -23,17 +23,11 @@ public class AuditServices {
     ProductServices productServices;
     @Autowired
     InventoryServices inventoryServices;
-    private static final Logger logger = LoggerFactory.getLogger(OrderServices.class);
     private static List<Inventory> inventoriesList;
     private static List<Order> ordersList;
     private static List<Product> productsList;
 
-    public ResponseEntity<?> audit() {
-        //TODO: Product sorted by sales
-        //TODO: Product sorted by purchase
-        //TODO: Product sorted by profit
-        //TODO: Product without inventory
-        //TODO: Product with stock less than safe quantity
+    public ResponseEntity<Audit> audit() {
         inventoriesList = inventoryServices.listAllInventory().getBody();
         ordersList = orderServices.listAllOrders().getBody();
         productsList = productServices.listAllProducts().getBody();
@@ -76,7 +70,6 @@ public class AuditServices {
     }
 
     private Audit.Profit createProductProfitAudit(Audit.Sales salesAudit, Audit.Purchase purchaseAudit) {
-        //Profit of each quantity= (Avg. income per item - Avg. expense per item) * quantity
         List<Audit.Profit.ProductProfit> productProfitDetailsList = new ArrayList<>();
         double totalProfit = 0.0;
         for(Audit.Sales.ProductSales productSales: salesAudit.getProductDetails()){
@@ -120,9 +113,8 @@ public class AuditServices {
                 totalExpense += productDetails.getQuantity()*productDetails.getPrice();
             }
         }
-        long uniqueProductCount = productPurchaseList.size();
         long orderCount = purchaseTypeOrdersList.size();
-        return new Audit.Purchase(orderCount, uniqueProductCount, totalItemCount, totalExpense, productPurchaseList);
+        return new Audit.Purchase(orderCount, totalItemCount, totalExpense, productPurchaseList);
     }
 
     private Audit.Sales createSalesAudit() {
@@ -149,8 +141,7 @@ public class AuditServices {
                 totalIncome += productDetails.getQuantity()*productDetails.getPrice();
             }
         }
-        long uniqueProductCount = productSalesList.size();
         long orderCount = salesTypeOrdersList.size();
-        return new Audit.Sales(orderCount, uniqueProductCount, totalItemCount, totalIncome, productSalesList);
+        return new Audit.Sales(orderCount,  totalItemCount, totalIncome, productSalesList);
     }
 }
