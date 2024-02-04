@@ -13,7 +13,7 @@ public class AuditController {
     @Autowired
     AuditServices auditServices;
 
-    @GetMapping("/audit")
+    @GetMapping(value = "/audit", produces = { "application/json", "application/*+json" })
     public ResponseEntity<?> audit(){
         return auditServices.audit();
     }
