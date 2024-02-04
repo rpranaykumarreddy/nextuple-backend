@@ -9,17 +9,26 @@ import com.nextuple.pranay.backend.service.ProductServices;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+<<<<<<< HEAD
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import java.util.List;
 
+=======
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+
+>>>>>>> origin/main
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.*;
 
+<<<<<<< HEAD
 @SpringBootTest
+=======
+>>>>>>> origin/main
 public class AuditServicesTests {
     @InjectMocks
     private AuditServices auditServices;
@@ -35,6 +44,7 @@ public class AuditServicesTests {
 
     @Test
     void testAudit() {
+<<<<<<< HEAD
         when(inventoryServices.listAllInventory()).thenReturn(TestUtil.AuditTestData.getInventoryListResponse());
         when(orderServices.listAllOrders()).thenReturn(TestUtil.AuditTestData.getOrderListResponse());
         when(productServices.listAllProducts()).thenReturn(TestUtil.AuditTestData.getProductListResponse());
@@ -72,3 +82,12 @@ public class AuditServicesTests {
 
     }
 }
+=======
+        when(inventoryServices.listAllInventory().getBody()).thenReturn(TestUtil.AuditTestData.getInventoryListResponse().getBody());
+        when(orderServices.listAllOrders()).thenReturn(TestUtil.AuditTestData.getOrderListResponse());
+        when(productServices.listAllProducts()).thenReturn(TestUtil.AuditTestData.getProductListResponse());
+
+        ResponseEntity<Audit> auditResponseEntity = auditServices.audit();
+    }
+}
+>>>>>>> origin/main
