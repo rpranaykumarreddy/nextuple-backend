@@ -115,8 +115,8 @@ public class TestUtil {
     }
     public static class OrderTestData{
         public static ProductsCatalog Order1Request = new ProductsCatalog(Arrays.asList(
-                    new ProductsCatalog.ProductData(TestUtil.ProductTestData.PRODUCT1_ID, 10, 10.0,0),
-                    new ProductsCatalog.ProductData(TestUtil.ProductTestData.PRODUCT2_ID, 100, 5.0,0)
+                    new ProductsCatalog.ProductData(TestUtil.ProductTestData.PRODUCT1_ID, 10, 10.0,2),
+                    new ProductsCatalog.ProductData(TestUtil.ProductTestData.PRODUCT2_ID, 100, 5.0,20)
             ));
         public static Order Order1Response = new Order(Arrays.asList(
                     new Order.ProductDetails(TestUtil.ProductTestData.PRODUCT1_ID, 10, 10.0),
@@ -124,7 +124,7 @@ public class TestUtil {
             ), Order.OrderType.PURCHASE_ORDER, 550.0);
 
         public static ProductsCatalog Order2Request =new ProductsCatalog(Arrays.asList(
-                    new ProductsCatalog.ProductData(TestUtil.ProductTestData.PRODUCT1_ID, 2, 10.0,0),
+                    new ProductsCatalog.ProductData(TestUtil.ProductTestData.PRODUCT1_ID, 2, 0,0),
                     new ProductsCatalog.ProductData(TestUtil.ProductTestData.PRODUCT2_ID, 50, 4.5,0)
             ));
         public static Order Order2Response = new Order(Arrays.asList(
@@ -277,7 +277,7 @@ public class TestUtil {
                     new Order.ProductDetails("65bfc4b5a2c8b35afd9ac22e", 2, 10.0),
                     new Order.ProductDetails("65bfc4c1a2c8b35afd9ac22f", 50, 4.5)
             ), Order.OrderType.SALE_ORDER, 245.0);
-order3.setId("65bfc4daa2c8b35afd9ac234");
+            order3.setId("65bfc4daa2c8b35afd9ac234");
             Order order4 = new Order(Arrays.asList(
                     new Order.ProductDetails("65bfc4b5a2c8b35afd9ac22e", 5, 12.0)
             ), Order.OrderType.SALE_ORDER, 60.0);
@@ -376,29 +376,323 @@ order3.setId("65bfc4daa2c8b35afd9ac234");
             }
              */
             Audit.Sales sales= new Audit.Sales(3,  60, 335.0,
-            Arrays.asList(
-                    new Audit.Sales.ProductSales("65bfc4b5a2c8b35afd9ac22e", "Milk", 10, 110.0, 11.0),
-                    new Audit.Sales.ProductSales("65bfc4c1a2c8b35afd9ac22f", "Salt", 50, 225.0, 4.5)
-            ));
+                    Arrays.asList(
+                            new Audit.Sales.ProductSales("65bfc4b5a2c8b35afd9ac22e", "Milk", 10, 110.0, 11.0),
+                            new Audit.Sales.ProductSales("65bfc4c1a2c8b35afd9ac22f", "Salt", 50, 225.0, 4.5)
+                    ));
             Audit.Purchase purchase= new Audit.Purchase(1,110,600.0,
-            Arrays.asList(
-                    new Audit.Purchase.ProductPurchase("65bfc4b5a2c8b35afd9ac22e", "Milk", 10, 100.0, 10.0),
-                    new Audit.Purchase.ProductPurchase("65bfc4c1a2c8b35afd9ac22f", "Salt", 100, 500.0, 5.0)
-            ));
+                    Arrays.asList(
+                            new Audit.Purchase.ProductPurchase("65bfc4b5a2c8b35afd9ac22e", "Milk", 10, 100.0, 10.0),
+                            new Audit.Purchase.ProductPurchase("65bfc4c1a2c8b35afd9ac22f", "Salt", 100, 500.0, 5.0)
+                    ));
             Audit.Profit profit= new Audit.Profit(-15.0,
-    Arrays.asList(
-                    new Audit.Profit.ProductProfit("65bfc4b5a2c8b35afd9ac22e", "Milk", 10.0, 1.0),
-                    new Audit.Profit.ProductProfit("65bfc4c1a2c8b35afd9ac22f", "Salt", -25.0, -0.5)
-            ));
+                    Arrays.asList(
+                            new Audit.Profit.ProductProfit("65bfc4b5a2c8b35afd9ac22e", "Milk", 10.0, 1.0),
+                            new Audit.Profit.ProductProfit("65bfc4c1a2c8b35afd9ac22f", "Salt", -25.0, -0.5)
+                    ));
             Audit.ProductWithoutInventory productWithoutInventory= new Audit.ProductWithoutInventory(
-    Arrays.asList(
-                    new Audit.ProductWithoutInventory.ProductDetails("65c0069fd811547d13f21e70", "System Design Book", "Book")
-            ));
+                    Arrays.asList(
+                            new Audit.ProductWithoutInventory.ProductDetails("65c0069fd811547d13f21e70", "System Design Book", "Book")
+                    ));
             Audit.ProductWithStockLessThanSafeQuantity productWithStockLessThanSafeQuantity= new Audit.ProductWithStockLessThanSafeQuantity(
-    Arrays.asList(
-                    new Audit.ProductWithStockLessThanSafeQuantity.ProductDetails("65bfc4b5a2c8b35afd9ac22e", "Milk", 0, 2, 2, 24.0)
-            ));
-        return new Audit(
+                    Arrays.asList(
+                            new Audit.ProductWithStockLessThanSafeQuantity.ProductDetails("65bfc4b5a2c8b35afd9ac22e", "Milk", 0, 2, 2, 24.0)
+                    ));
+            return new Audit(
+                    sales,
+                    purchase,
+                    profit,
+                    productWithoutInventory,
+                    productWithStockLessThanSafeQuantity
+            );
+        }
+    }
+    public static class ExtraAuditTestData{
+
+        public static ResponseEntity<List<Inventory>> getInventoryListResponse() {
+            /*
+            [
+                {
+                    "id": "65c1127019d171245998e4b4",
+                    "productId": "65c1124119d171245998e4b2",
+                    "quantity": 0,
+                    "safeQuantity": 2,
+                    "lastTime": "2024-02-05T22:23:22.84"
+                },
+                {
+                    "id": "65c1127019d171245998e4b5",
+                    "productId": "65c1125219d171245998e4b3",
+                    "quantity": 50,
+                    "safeQuantity": 20,
+                    "lastTime": "2024-02-05T22:23:16.688"
+                }
+            ]
+             */
+            Inventory inventory1 = new Inventory("65c1124119d171245998e4b2", 0, 2);
+            inventory1.setId("65c1127019d171245998e4b4");
+            Inventory inventory2 = new Inventory("65c1125219d171245998e4b3", 50, 20);
+            inventory2.setId("65c1127019d171245998e4b5");
+            return new ResponseEntity<>(Arrays.asList(inventory1, inventory2), HttpStatus.OK);
+        }
+        public static ResponseEntity<List<Product>> getProductListResponse() {
+            /*
+            [
+    {
+        "id": "65c1123e19d171245998e4b1",
+        "name": "System Design Book",
+        "price": 300.0,
+        "category": "Book",
+        "lastTime": "2024-02-05T22:22:14.624"
+    },
+    {
+        "id": "65c1124119d171245998e4b2",
+        "name": "Milk",
+        "price": 12.0,
+        "category": "Dairy",
+        "lastTime": "2024-02-05T22:23:20.067"
+    },
+    {
+        "id": "65c1125219d171245998e4b3",
+        "name": "Salt",
+        "price": 5.0,
+        "category": "Grocery",
+        "lastTime": "2024-02-05T22:22:34.19"
+    }
+]
+             */
+            Product product1 = new Product("Milk", 12.0, "Dairy");
+            product1.setId("65c1124119d171245998e4b2");
+            Product product2 = new Product("Salt", 5.0, "Grocery");
+            product2.setId("65c1125219d171245998e4b3");
+            Product product3 = new Product("System Design Book", 300.0, "Book");
+            product3.setId("65c1123e19d171245998e4b1");
+            return ResponseEntity.ok(Arrays.asList(product1, product2, product3));
+        }
+        public static ResponseEntity<List<Order>> getOrderListResponse() {
+            /*
+            [
+                {
+                    "id": "65c1127019d171245998e4b6",
+                    "type": "PURCHASE_ORDER",
+                    "productCatalog": [
+                        {
+                            "productId": "65c1124119d171245998e4b2",
+                            "quantity": 5,
+                            "price": 10.0
+                        },
+                        {
+                            "productId": "65c1125219d171245998e4b3",
+                            "quantity": 50,
+                            "price": 5.0
+                        }
+                    ],
+                    "totalPrice": 300.0,
+                    "lastTime": "2024-02-05T22:23:04.919"
+                },
+                {
+                    "id": "65c1127419d171245998e4b7",
+                    "type": "PURCHASE_ORDER",
+                    "productCatalog": [
+                        {
+                            "productId": "65c1124119d171245998e4b2",
+                            "quantity": 5,
+                            "price": 10.0
+                        },
+                        {
+                            "productId": "65c1125219d171245998e4b3",
+                            "quantity": 50,
+                            "price": 5.0
+                        }
+                    ],
+                    "totalPrice": 300.0,
+                    "lastTime": "2024-02-05T22:23:08.91"
+                },
+                {
+                    "id": "65c1127919d171245998e4b8",
+                    "type": "SALE_ORDER",
+                    "productCatalog": [
+                        {
+                            "productId": "65c1124119d171245998e4b2",
+                            "quantity": 3,
+                            "price": 10.0
+                        }
+                    ],
+                    "totalPrice": 30.0,
+                    "lastTime": "2024-02-05T22:23:13.134"
+                },
+                {
+                    "id": "65c1127c19d171245998e4b9",
+                    "type": "SALE_ORDER",
+                    "productCatalog": [
+                        {
+                            "productId": "65c1124119d171245998e4b2",
+                            "quantity": 2,
+                            "price": 10.0
+                        },
+                        {
+                            "productId": "65c1125219d171245998e4b3",
+                            "quantity": 50,
+                            "price": 4.5
+                        }
+                    ],
+                    "totalPrice": 245.0,
+                    "lastTime": "2024-02-05T22:23:16.747"
+                },
+                {
+                    "id": "65c1128219d171245998e4ba",
+                    "type": "SALE_ORDER",
+                    "productCatalog": [
+                        {
+                            "productId": "65c1124119d171245998e4b2",
+                            "quantity": 5,
+                            "price": 12.0
+                        }
+                    ],
+                    "totalPrice": 60.0,
+                    "lastTime": "2024-02-05T22:23:22.867"
+                }
+            ]
+             */
+            Order order1 = new Order(Arrays.asList(
+                    new Order.ProductDetails("65c1124119d171245998e4b2", 5, 10.0),
+                    new Order.ProductDetails("65c1125219d171245998e4b3", 50, 5.0)
+            ), Order.OrderType.PURCHASE_ORDER, 300.0);
+            order1.setId("65c1127019d171245998e4b6");
+            Order order2 = new Order(Arrays.asList(
+                    new Order.ProductDetails("65c1124119d171245998e4b2", 5, 10.0),
+                    new Order.ProductDetails("65c1125219d171245998e4b3", 50, 5.0)
+            ), Order.OrderType.PURCHASE_ORDER, 300.0);
+            order2.setId("65c1127419d171245998e4b7");
+            Order order3 = new Order(Arrays.asList(
+                    new Order.ProductDetails("65c1124119d171245998e4b2", 3, 10.0)
+            ), Order.OrderType.SALE_ORDER, 30.0);
+            order3.setId("65c1127919d171245998e4b8");
+            Order order4 = new Order(Arrays.asList(
+                    new Order.ProductDetails("65c1124119d171245998e4b2", 2, 10.0),
+                    new Order.ProductDetails("65c1125219d171245998e4b3", 50, 4.5)
+            ), Order.OrderType.SALE_ORDER, 245.0);
+            order4.setId("65c1127c19d171245998e4b9");
+            Order order5 = new Order(Arrays.asList(
+                    new Order.ProductDetails("65c1124119d171245998e4b2", 5, 12.0)
+            ), Order.OrderType.SALE_ORDER, 60.0);
+            order5.setId("65c1128219d171245998e4ba");
+            return ResponseEntity.ok(Arrays.asList(order1, order2, order3, order4, order5));
+        }
+        public static Audit getAuditResponse() {
+            /*
+            {
+    "sales": {
+        "orderCount": 3,
+        "uniqueProductCount": 2,
+        "totalItemCount": 60,
+        "totalIncome": 335.0,
+        "productDetails": [
+            {
+                "productId": "65c1124119d171245998e4b2",
+                "productName": "Milk",
+                "itemCount": 10,
+                "totalIncome": 110.0,
+                "incomePerItem": 11.0
+            },
+            {
+                "productId": "65c1125219d171245998e4b3",
+                "productName": "Salt",
+                "itemCount": 50,
+                "totalIncome": 225.0,
+                "incomePerItem": 4.5
+            }
+        ]
+    },
+    "purchase": {
+        "orderCount": 2,
+        "uniqueProductCount": 2,
+        "totalItemCount": 110,
+        "totalExpenditure": 600.0,
+        "productDetails": [
+            {
+                "productId": "65c1124119d171245998e4b2",
+                "productName": "Milk",
+                "itemCount": 10,
+                "totalExpenditure": 100.0,
+                "expenditurePerItem": 10.0
+            },
+            {
+                "productId": "65c1125219d171245998e4b3",
+                "productName": "Salt",
+                "itemCount": 100,
+                "totalExpenditure": 500.0,
+                "expenditurePerItem": 5.0
+            }
+        ]
+    },
+    "profit": {
+        "totalProfit": -15.0,
+        "productDetails": [
+            {
+                "productId": "65c1124119d171245998e4b2",
+                "productName": "Milk",
+                "totalProfit": 10.0,
+                "profitPerItem": 1.0
+            },
+            {
+                "productId": "65c1125219d171245998e4b3",
+                "productName": "Salt",
+                "totalProfit": -25.0,
+                "profitPerItem": -0.5
+            }
+        ]
+    },
+    "productWithoutInventory": {
+        "countOfProduct": 1,
+        "productDetails": [
+            {
+                "productId": "65c1123e19d171245998e4b1",
+                "productName": "System Design Book",
+                "productCategory": "Book"
+            }
+        ]
+    },
+    "productWithStockLessThanSafeQuantity": {
+        "countOfProduct": 1,
+        "totalExpenditureNeeded": 24.0,
+        "productDetails": [
+            {
+                "productId": "65c1124119d171245998e4b2",
+                "productName": "Milk",
+                "currentStock": 0,
+                "safeQuantity": 2,
+                "stockNeeded": 2,
+                "expenditureNeeded": 24.0
+            }
+        ]
+    },
+    "auditTime": "2024-02-05T22:23:30.0409343"
+}
+//             */
+            Audit.Sales sales= new Audit.Sales(3,  60, 335.0,
+                    Arrays.asList(
+                            new Audit.Sales.ProductSales("65c1124119d171245998e4b2", "Milk", 10, 110.0, 11.0),
+                            new Audit.Sales.ProductSales("65c1125219d171245998e4b3", "Salt", 50, 225.0, 4.5)
+                    ));
+            Audit.Purchase purchase= new Audit.Purchase(2,110,600.0,
+                    Arrays.asList(
+                            new Audit.Purchase.ProductPurchase("65c1124119d171245998e4b2", "Milk", 10, 100.0, 10.0),
+                            new Audit.Purchase.ProductPurchase("65c1125219d171245998e4b3", "Salt", 100, 500.0, 5.0)
+                    ));
+            Audit.Profit profit= new Audit.Profit(-15.0,
+                    Arrays.asList(
+                            new Audit.Profit.ProductProfit("65c1124119d171245998e4b2", "Milk", 10.0, 1.0),
+                            new Audit.Profit.ProductProfit("65c1125219d171245998e4b3", "Salt", -25.0, -0.5)
+                    ));
+            Audit.ProductWithoutInventory productWithoutInventory= new Audit.ProductWithoutInventory(
+                    Arrays.asList(
+                            new Audit.ProductWithoutInventory.ProductDetails("65c1123e19d171245998e4b1", "System Design Book", "Book")
+                    ));
+            Audit.ProductWithStockLessThanSafeQuantity productWithStockLessThanSafeQuantity= new Audit.ProductWithStockLessThanSafeQuantity(
+                    Arrays.asList(
+                            new Audit.ProductWithStockLessThanSafeQuantity.ProductDetails("65c1124119d171245998e4b2", "Milk", 0, 2, 2, 24.0)
+                    ));
+            return new Audit(
                     sales,
                     purchase,
                     profit,

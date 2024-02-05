@@ -65,4 +65,42 @@ public class AuditServicesTests {
         verify(productServices, times(1)).listAllProducts();
 
     }
+    @Test
+    void testAudit_ForCompleteLines() {
+        when(inventoryServices.listAllInventory()).thenReturn(TestUtil.ExtraAuditTestData.getInventoryListResponse());
+        when(orderServices.listAllOrders()).thenReturn(TestUtil.ExtraAuditTestData.getOrderListResponse());
+        when(productServices.listAllProducts()).thenReturn(TestUtil.ExtraAuditTestData.getProductListResponse());
+
+        Audit audit = auditServices.audit().getBody();
+        Audit expectedAudit = TestUtil.ExtraAuditTestData.getAuditResponse();
+        assertNotNull(audit);
+
+        assertEquals(expectedAudit.getSales().getOrderCount(), audit.getSales().getOrderCount());
+        assertEquals(expectedAudit.getSales().getUniqueProductCount(), audit.getSales().getUniqueProductCount());
+        assertEquals(expectedAudit.getSales().getTotalItemCount(), audit.getSales().getTotalItemCount());
+        assertEquals(expectedAudit.getSales().getTotalIncome(), audit.getSales().getTotalIncome());
+        assertEquals(expectedAudit.getSales().getProductDetails().size(), audit.getSales().getProductDetails().size());
+
+        assertEquals(expectedAudit.getPurchase().getOrderCount(), audit.getPurchase().getOrderCount());
+        assertEquals(expectedAudit.getPurchase().getUniqueProductCount(), audit.getPurchase().getUniqueProductCount());
+        assertEquals(expectedAudit.getPurchase().getTotalItemCount(), audit.getPurchase().getTotalItemCount());
+        assertEquals(expectedAudit.getPurchase().getTotalExpenditure(), audit.getPurchase().getTotalExpenditure());
+        assertEquals(expectedAudit.getPurchase().getProductDetails().size(), audit.getPurchase().getProductDetails().size());
+
+        assertEquals(expectedAudit.getProfit().getTotalProfit(), audit.getProfit().getTotalProfit());
+        assertEquals(expectedAudit.getProfit().getProductDetails().size(), audit.getProfit().getProductDetails().size());
+
+        assertEquals(expectedAudit.getProductWithoutInventory().getCountOfProduct(), audit.getProductWithoutInventory().getCountOfProduct());
+        assertEquals(expectedAudit.getProductWithoutInventory().getProductDetails().size(), audit.getProductWithoutInventory().getProductDetails().size());
+
+        assertEquals(expectedAudit.getProductWithStockLessThanSafeQuantity().getCountOfProduct(), audit.getProductWithStockLessThanSafeQuantity().getCountOfProduct());
+        assertEquals(expectedAudit.getProductWithStockLessThanSafeQuantity().getTotalExpenditureNeeded(), audit.getProductWithStockLessThanSafeQuantity().getTotalExpenditureNeeded());
+        assertEquals(expectedAudit.getProductWithStockLessThanSafeQuantity().getProductDetails().size(), audit.getProductWithStockLessThanSafeQuantity().getProductDetails().size());
+
+
+        verify(inventoryServices, times(1)).listAllInventory();
+        verify(orderServices, times(1)).listAllOrders();
+        verify(productServices, times(1)).listAllProducts();
+
+    }
 }

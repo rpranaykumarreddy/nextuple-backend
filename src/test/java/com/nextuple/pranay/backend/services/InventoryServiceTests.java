@@ -49,6 +49,14 @@ assertEquals(TestUtil.InventoryTestData.INVENTORY1_PRODUCT_ID, responseEntity.ge
         });
     }
     @Test
+    public void testCreateInventory_InventoryAlreadyExistsException() {
+        Inventory inventory = TestUtil.InventoryTestData.getInventory1Response();
+        when(inventoryRepo.findAllByProductId(inventory.getProductId())).thenReturn(Arrays.asList(inventory));
+        assertThrows(CustomException.InventoryAlreadyExistsException.class, () -> {
+            inventoryServices.createInventory(inventory);
+        });
+    }
+    @Test
     public void testFindInventoryById_Success() {
         Inventory inventory = TestUtil.InventoryTestData.getInventory1Response();
         when(inventoryRepo.findById(TestUtil.InventoryTestData.INVENTORY1_ID)).thenReturn(java.util.Optional.of(inventory));
@@ -70,6 +78,13 @@ assertEquals(TestUtil.InventoryTestData.INVENTORY1_PRODUCT_ID, responseEntity.ge
         ResponseEntity responseEntity = inventoryServices.findInventoryByProductId(TestUtil.InventoryTestData.INVENTORY1_PRODUCT_ID);
         assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
         verify(logger, never()).error(anyString());
+    }
+    @Test
+    public void testFindInventoryByProductId_InventoryNotFoundException() {
+        when(inventoryRepo.findAllByProductId(TestUtil.InventoryTestData.INVENTORY1_PRODUCT_ID)).thenReturn(Arrays.asList());
+        assertThrows(CustomException.InventoryNotFoundException.class, () -> {
+            inventoryServices.findInventoryByProductId(TestUtil.InventoryTestData.INVENTORY1_PRODUCT_ID);
+        });
     }
     @Test
     public void testUpdateInventoryById_Success() {

@@ -76,6 +76,13 @@ public class OrderServiceTests {
         assertNotNull(response.getBody());
     }
     @Test
+    public void testCreatePurchaseOrder_EmptyProductCatalog() {
+        ProductsCatalog emptyProductsCatalog = new ProductsCatalog();
+        assertThrows(CustomException.ProductCatalogNotFoundExpception.class, () -> {
+            orderServices.createPurchaseOrder(emptyProductsCatalog);
+        });
+    }
+    @Test
     public void testCreatePurchaseOrder_QuantityZeroOrNegative() {
         when(productServices.findProductById("1")).thenReturn(TestUtil.ProductTestData.getProduct1Response());
 
@@ -130,6 +137,13 @@ public class OrderServiceTests {
         assertNotNull(response.getBody());
     }
     @Test
+    public void testCreateSaleOrder_QuantityZeroOrNegative() {
+        when(productServices.findProductById("1")).thenReturn(TestUtil.ProductTestData.getProduct1Response());
+        assertThrows(CustomException.QuantityIsZeroOrNegativeException.class, () -> {
+            orderServices.createSaleOrder(TestUtil.OrderTestData.OrderQuantityZeroRequest);
+        });
+    }
+    @Test
     public void testCreateSaleOrder_ProductNotFound() {
         when(productServices.findProductById(anyString())).thenReturn(null);
         assertThrows(CustomException.ProductNotFoundException.class, () -> {
@@ -143,6 +157,18 @@ public class OrderServiceTests {
                 new ResponseEntity<>(TestUtil.InventoryTestData.getInventory1Response(), HttpStatus.OK));
 
         assertThrows(CustomException.QuantityNotAvailableException.class, () -> {
+            orderServices.createSaleOrder(TestUtil.OrderTestData.Order2Request);
+        });
+    }
+    @Test
+    public void testCreateSaleOrder_InventoryNotFound() {
+        when(productServices.findProductById("1")).thenReturn(TestUtil.ProductTestData.getProduct1Response());
+        when(productServices.findProductById("2")).thenReturn(TestUtil.ProductTestData.getProduct2Response());
+        when(inventoryServices.findInventoryByProductId(anyString())).thenReturn(
+                new ResponseEntity<>(null, HttpStatus.OK));
+        when(inventoryServices.updateInventories(any(List.class))).thenReturn(new ResponseEntity<>(true, HttpStatus.OK));
+        when(orderRepo.save(any(Order.class))).thenReturn(TestUtil.OrderTestData.Order2Response);
+        assertThrows(CustomException.InventoryNotFoundException.class, () -> {
             orderServices.createSaleOrder(TestUtil.OrderTestData.Order2Request);
         });
     }
@@ -164,18 +190,6 @@ public class OrderServiceTests {
         when(inventoryServices.updateInventories(any(List.class))).thenReturn(new ResponseEntity<>(true, HttpStatus.OK));
         when(orderRepo.save(any(Order.class))).thenThrow(new RuntimeException("A database error"));
         assertThrows(CustomException.SaveNotSuccessfulException.class, () -> {
-            orderServices.createSaleOrder(TestUtil.OrderTestData.Order2Request);
-        });
-    }
-    @Test
-    public void testCreateSaleOrder_InventoryNotFound() {
-        when(productServices.findProductById("1")).thenReturn(TestUtil.ProductTestData.getProduct1Response());
-        when(productServices.findProductById("2")).thenReturn(TestUtil.ProductTestData.getProduct2Response());
-        when(inventoryServices.findInventoryByProductId("1")).thenThrow(new CustomException.InventoryNotFoundException("Inventory not found"));
-        when(inventoryServices.findInventoryByProductId("2")).thenThrow(new CustomException.InventoryNotFoundException("Inventory not found"));
-        when(inventoryServices.updateInventories(any(List.class))).thenReturn(new ResponseEntity<>(true, HttpStatus.OK));
-        when(orderRepo.save(any(Order.class))).thenReturn(TestUtil.OrderTestData.Order2Response);
-        assertThrows(CustomException.InventoryNotFoundException.class, () -> {
             orderServices.createSaleOrder(TestUtil.OrderTestData.Order2Request);
         });
     }
