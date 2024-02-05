@@ -1,11 +1,8 @@
 package com.nextuple.pranay.backend.controller.output;
 
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 
 public class Audit {
     private Sales sales;
@@ -23,7 +20,21 @@ public class Audit {
         this.productWithStockLessThanSafeQuantity = productWithStockLessThanSafeQuantity;
         this.auditTime = LocalDateTime.now();
     }
-
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Audit audit = (Audit) o;
+        return Objects.equals(sales, audit.sales) &&
+                Objects.equals(purchase, audit.purchase) &&
+                Objects.equals(profit, audit.profit) &&
+                Objects.equals(productWithoutInventory, audit.productWithoutInventory) &&
+                Objects.equals(productWithStockLessThanSafeQuantity, audit.productWithStockLessThanSafeQuantity);
+    }
+    @Override
+    public int hashCode() {
+        return Objects.hash(sales, purchase, profit, productWithoutInventory, productWithStockLessThanSafeQuantity);
+    }
     public Sales getSales() {
         return sales;
     }
@@ -78,7 +89,7 @@ public class Audit {
                 -> uniqueProductCount
                 -> totalItemCount
                 -> totalIncome
-                -> productDetails (sort by itemCount)
+                -> productDetails (sort by itemCount DSC)
                     -> productId
                     -> productName
                     -> itemCount
@@ -94,12 +105,33 @@ public class Audit {
 
         public Sales(long orderCount,  long totalItemCount, double totalIncome, List<ProductSales> productDetails) {
             this.orderCount = orderCount;
-            this.uniqueProductCount = productDetails.size();
             this.totalItemCount = totalItemCount;
             this.totalIncome = totalIncome;
             this.productDetails = productDetails;
+            updateUniqueProductCount();
+            sortProductDetails();
         }
-
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            Sales sales = (Sales) o;
+            return orderCount == sales.orderCount &&
+                    uniqueProductCount == sales.uniqueProductCount &&
+                    totalItemCount == sales.totalItemCount &&
+                    Double.compare(sales.totalIncome, totalIncome) == 0 &&
+                    Objects.equals(productDetails, sales.productDetails);
+        }
+        @Override
+        public int hashCode() {
+            return Objects.hash(orderCount, uniqueProductCount, totalItemCount, totalIncome, productDetails);
+        }
+        public void updateUniqueProductCount(){
+            this.uniqueProductCount = productDetails.size();
+        }
+        public void sortProductDetails(){
+            this.productDetails.sort((o1, o2) -> (int) (o2.getItemCount() - o1.getItemCount()));
+        }
         public long getOrderCount() {
             return orderCount;
         }
@@ -113,7 +145,7 @@ public class Audit {
         }
 
         public void setUniqueProductCount(long uniqueProductCount) {
-            this.uniqueProductCount = uniqueProductCount;
+            updateUniqueProductCount();
         }
 
         public long getTotalItemCount() {
@@ -138,6 +170,8 @@ public class Audit {
 
         public void setProductDetails(List<ProductSales> productDetails) {
             this.productDetails = productDetails;
+            updateUniqueProductCount();
+            sortProductDetails();
         }
 
         public static class ProductSales{
@@ -154,7 +188,21 @@ public class Audit {
                 this.totalIncome = totalIncome;
                 this.incomePerItem = incomePerItem;
             }
-
+            @Override
+            public boolean equals(Object o) {
+                if (this == o) return true;
+                if (o == null || getClass() != o.getClass()) return false;
+                ProductSales that = (ProductSales) o;
+                return itemCount == that.itemCount &&
+                        Double.compare(that.totalIncome, totalIncome) == 0 &&
+                        Double.compare(that.incomePerItem, incomePerItem) == 0 &&
+                        Objects.equals(productId, that.productId) &&
+                        Objects.equals(productName, that.productName);
+            }
+            @Override
+            public int hashCode() {
+                return Objects.hash(productId, productName, itemCount, totalIncome, incomePerItem);
+            }
             public String getProductId() {
                 return productId;
             }
@@ -203,7 +251,7 @@ public class Audit {
         -> uniqueProductCount
         -> totalItemCount
         -> totalExpenditure
-        -> productDetails (sort by itemCount)
+        -> productDetails (sort by itemCount DSC)
             -> productId
             -> productName
             -> itemCount
@@ -231,7 +279,7 @@ public class Audit {
         }
 
         public void setUniqueProductCount(long uniqueProductCount) {
-            this.uniqueProductCount = uniqueProductCount;
+            updateUniqueProductCount();
         }
 
         public long getTotalItemCount() {
@@ -256,14 +304,39 @@ public class Audit {
 
         public void setProductDetails(List<ProductPurchase> productDetails) {
             this.productDetails = productDetails;
+            updateUniqueProductCount();
+            sortProductDetails();
         }
 
         public Purchase(long orderCount,  long totalItemCount, double totalExpenditure, List<ProductPurchase> productDetails) {
             this.orderCount = orderCount;
-            this.uniqueProductCount = productDetails.size();
             this.totalItemCount = totalItemCount;
             this.totalExpenditure = totalExpenditure;
             this.productDetails = productDetails;
+            updateUniqueProductCount();
+            sortProductDetails();
+        }
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            Purchase purchase = (Purchase) o;
+            return orderCount == purchase.orderCount &&
+                    uniqueProductCount == purchase.uniqueProductCount &&
+                    totalItemCount == purchase.totalItemCount &&
+                    Double.compare(purchase.totalExpenditure, totalExpenditure) == 0 &&
+                    Objects.equals(productDetails, purchase.productDetails);
+        }
+        @Override
+        public int hashCode() {
+            return Objects.hash(orderCount, uniqueProductCount, totalItemCount, totalExpenditure, productDetails);
+        }
+        private void sortProductDetails() {
+            this.productDetails.sort((o1, o2) -> (int) (o2.getItemCount() - o1.getItemCount()));
+        }
+
+        private void updateUniqueProductCount() {
+            this.uniqueProductCount = productDetails.size();
         }
 
         public static class ProductPurchase{
@@ -279,6 +352,23 @@ public class Audit {
                 this.itemCount = itemCount;
                 this.totalExpenditure = totalExpenditure;
                 this.expenditurePerItem = expenditurePerItem;
+            }
+
+            @Override
+            public boolean equals(Object o) {
+                if (this == o) return true;
+                if (o == null || getClass() != o.getClass()) return false;
+                ProductPurchase that = (ProductPurchase) o;
+                return itemCount == that.itemCount &&
+                        Double.compare(that.totalExpenditure, totalExpenditure) == 0 &&
+                        Double.compare(that.expenditurePerItem, expenditurePerItem) == 0 &&
+                        Objects.equals(productId, that.productId) &&
+                        Objects.equals(productName, that.productName);
+            }
+
+            @Override
+            public int hashCode() {
+                return Objects.hash(productId, productName, itemCount, totalExpenditure, expenditurePerItem);
             }
 
             public String getProductId() {
@@ -325,7 +415,7 @@ public class Audit {
     /*
     Profit
         -> totalProfit
-        -> productDetails (sort by profit)
+        -> productDetails (sort by profit DSC)
             -> productId
             -> productName
             -> totalProfit
@@ -339,6 +429,24 @@ public class Audit {
         public Profit(double totalProfit, List<ProductProfit> productDetails) {
             this.totalProfit = totalProfit;
             this.productDetails = productDetails;
+            sortProductDetails();
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            Profit profit = (Profit) o;
+            return Double.compare(profit.totalProfit, totalProfit) == 0 &&
+                    Objects.equals(productDetails, profit.productDetails);
+        }
+        @Override
+        public int hashCode() {
+            return Objects.hash(totalProfit, productDetails);
+        }
+
+        private void sortProductDetails() {
+            this.productDetails.sort((o1, o2) -> (int) (o2.getTotalProfit() - o1.getTotalProfit()));
         }
 
         public double getTotalProfit() {
@@ -355,6 +463,7 @@ public class Audit {
 
         public void setProductDetails(List<ProductProfit> productDetails) {
             this.productDetails = productDetails;
+            sortProductDetails();
         }
 
         public static class ProductProfit {
@@ -368,6 +477,20 @@ public class Audit {
                 this.productName = productName;
                 this.totalProfit = totalProfit;
                 this.profitPerItem = profitPerItem;
+            }
+            @Override
+            public boolean equals(Object o) {
+                if (this == o) return true;
+                if (o == null || getClass() != o.getClass()) return false;
+                ProductProfit that = (ProductProfit) o;
+                return Double.compare(that.totalProfit, totalProfit) == 0 &&
+                        Double.compare(that.profitPerItem, profitPerItem) == 0 &&
+                        Objects.equals(productId, that.productId) &&
+                        Objects.equals(productName, that.productName);
+            }
+            @Override
+            public int hashCode() {
+                return Objects.hash(productId, productName, totalProfit, profitPerItem);
             }
 
             public String getProductId() {
@@ -408,7 +531,7 @@ public class Audit {
     }
     /*
     Product without inventory
-        -> ProductDetails
+        -> ProductDetails (sort by productId ASC)
             -> productId
             -> productName
             -> productCategory
@@ -419,7 +542,28 @@ public class Audit {
 
         public ProductWithoutInventory(List<ProductDetails> productDetails) {
             this.productDetails = productDetails;
+            sortProductDetails();
+            updateCountOfProduct();
+        }
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            ProductWithoutInventory that = (ProductWithoutInventory) o;
+            return countOfProduct == that.countOfProduct &&
+                    Objects.equals(productDetails, that.productDetails);
+        }
+        @Override
+        public int hashCode() {
+            return Objects.hash(countOfProduct, productDetails);
+        }
+
+        private void updateCountOfProduct() {
             this.countOfProduct = productDetails.size();
+        }
+
+        private void sortProductDetails() {
+            this.productDetails.sort((o1, o2) -> o1.getProductId().compareTo(o2.getProductId()));
         }
 
         public long getCountOfProduct() {
@@ -427,7 +571,7 @@ public class Audit {
         }
 
         public void setCountOfProduct(long countOfProduct) {
-            this.countOfProduct = countOfProduct;
+            updateCountOfProduct();
         }
 
         public List<ProductDetails> getProductDetails() {
@@ -436,6 +580,8 @@ public class Audit {
 
         public void setProductDetails(List<ProductDetails> productDetails) {
             this.productDetails = productDetails;
+            sortProductDetails();
+            updateCountOfProduct();
         }
 
         public static class ProductDetails {
@@ -447,6 +593,19 @@ public class Audit {
                 this.productId = productId;
                 this.productName = productName;
                 this.productCategory = productCategory;
+            }
+            @Override
+            public boolean equals(Object o) {
+                if (this == o) return true;
+                if (o == null || getClass() != o.getClass()) return false;
+                ProductDetails that = (ProductDetails) o;
+                return Objects.equals(productId, that.productId) &&
+                        Objects.equals(productName, that.productName) &&
+                        Objects.equals(productCategory, that.productCategory);
+            }
+            @Override
+            public int hashCode() {
+                return Objects.hash(productId, productName, productCategory);
             }
 
             public String getProductId() {
@@ -478,14 +637,13 @@ public class Audit {
     Products with stock less than safe quantity
         -> countOfProduct
         -> totalExpenditureNeeded
-        -> ProductDetails
+        -> ProductDetails (sort by expenditureNeeded DSC)
             -> productId
             -> productName
             -> currentStock
             -> safeQuantity
             -> stockNeeded
             -> expenditureNeeded
-            -> profitRank
      */
     public static class ProductWithStockLessThanSafeQuantity {
         private long countOfProduct;
@@ -494,7 +652,31 @@ public class Audit {
 
         public ProductWithStockLessThanSafeQuantity( List<ProductDetails> productDetails) {
             this.productDetails = productDetails;
+            sortProductDetails();
+            updateCountOfProduct();
+            updateTotalExpenditureNeeded();;
+        }
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            ProductWithStockLessThanSafeQuantity that = (ProductWithStockLessThanSafeQuantity) o;
+            return countOfProduct == that.countOfProduct &&
+                    Double.compare(that.totalExpenditureNeeded, totalExpenditureNeeded) == 0 &&
+                    Objects.equals(productDetails, that.productDetails);
+        }
+        @Override
+        public int hashCode() {
+            return Objects.hash(countOfProduct, totalExpenditureNeeded, productDetails);
+        }
+
+        public void sortProductDetails() {
+            this.productDetails.sort((o1, o2) -> (int) (o2.getExpenditureNeeded() - o1.getExpenditureNeeded()));
+        }
+        public void updateCountOfProduct() {
             this.countOfProduct = productDetails.size();
+        }
+        public void updateTotalExpenditureNeeded() {
             this.totalExpenditureNeeded = productDetails.stream().mapToDouble(ProductDetails::getExpenditureNeeded).sum();
         }
 
@@ -503,7 +685,7 @@ public class Audit {
         }
 
         public void setCountOfProduct(long countOfProduct) {
-            this.countOfProduct = countOfProduct;
+            updateCountOfProduct();
         }
 
         public double getTotalExpenditureNeeded() {
@@ -511,7 +693,7 @@ public class Audit {
         }
 
         public void setTotalExpenditureNeeded(double totalExpenditureNeeded) {
-            this.totalExpenditureNeeded = totalExpenditureNeeded;
+            updateTotalExpenditureNeeded();
         }
 
         public List<ProductDetails> getProductDetails() {
@@ -520,6 +702,9 @@ public class Audit {
 
         public void setProductDetails(List<ProductDetails> productDetails) {
             this.productDetails = productDetails;
+            sortProductDetails();
+            updateCountOfProduct();
+            updateTotalExpenditureNeeded();
         }
 
         public static class ProductDetails {
@@ -577,7 +762,22 @@ public class Audit {
             public void setExpenditureNeeded(double expenditureNeeded) {
                 this.expenditureNeeded = expenditureNeeded;
             }
-
+            @Override
+            public boolean equals(Object o) {
+                if (this == o) return true;
+                if (o == null || getClass() != o.getClass()) return false;
+                ProductDetails that = (ProductDetails) o;
+                return currentStock == that.currentStock &&
+                        safeQuantity == that.safeQuantity &&
+                        stockNeeded == that.stockNeeded &&
+                        Double.compare(that.expenditureNeeded, expenditureNeeded) == 0 &&
+                        Objects.equals(productId, that.productId) &&
+                        Objects.equals(productName, that.productName);
+            }
+            @Override
+            public int hashCode() {
+                return Objects.hash(productId, productName, currentStock, safeQuantity, stockNeeded, expenditureNeeded);
+            }
 
             public ProductDetails(String productId, String productName, int currentStock, int safeQuantity, int stockNeeded, double expenditureNeeded) {
                 this.productId = productId;
