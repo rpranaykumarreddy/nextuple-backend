@@ -1,7 +1,6 @@
 package com.nextuple.pranay.backend.repo;
 
 import com.nextuple.pranay.backend.model.Inventory;
-import com.nextuple.pranay.backend.model.Product;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
 import java.util.List;

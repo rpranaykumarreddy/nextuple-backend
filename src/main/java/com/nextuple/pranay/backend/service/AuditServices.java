@@ -4,9 +4,6 @@ import com.nextuple.pranay.backend.controller.output.Audit;
 import com.nextuple.pranay.backend.model.Inventory;
 import com.nextuple.pranay.backend.model.Order;
 import com.nextuple.pranay.backend.model.Product;
-import com.nextuple.pranay.backend.repo.OrderRepo;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -76,7 +73,6 @@ public class AuditServices {
             String productId = productSales.getProductId();
             String productName = productSales.getProductName();
             long itemCount = productSales.getItemCount();
-            double totalIncome = productSales.getTotalIncome();
             double incomePerItem = productSales.getIncomePerItem();
             Audit.Purchase.ProductPurchase productPurchase = purchaseAudit.getProductDetails().stream().filter(product -> product.getProductId().equals(productId)).findFirst().orElse(null);
             double profit = (incomePerItem - productPurchase.getExpenditurePerItem()) * itemCount;
@@ -100,7 +96,7 @@ public class AuditServices {
                 String name = productsList.stream().filter(product -> product.getId().equals(productId)).findFirst().get().getName();
                 int quantity = productDetails.getQuantity();
                 double price = productDetails.getPrice();
-                Audit.Purchase.ProductPurchase productPurchase = productPurchaseList.stream().filter(product -> product.getProductId().equals(productId)).findFirst().orElse(null);;
+                Audit.Purchase.ProductPurchase productPurchase = productPurchaseList.stream().filter(product -> product.getProductId().equals(productId)).findFirst().orElse(null);
                 if(productPurchase == null){
                     productPurchase = new Audit.Purchase.ProductPurchase(productId, name, quantity, quantity*price, price);
                     productPurchaseList.add(productPurchase);
@@ -128,7 +124,7 @@ public class AuditServices {
                 String name = productsList.stream().filter(product -> product.getId().equals(productId)).findFirst().get().getName();
                 int quantity = productDetails.getQuantity();
                 double price = productDetails.getPrice();
-                Audit.Sales.ProductSales productSales = productSalesList.stream().filter(product -> product.getProductId().equals(productId)).findFirst().orElse(null);;
+                Audit.Sales.ProductSales productSales = productSalesList.stream().filter(product -> product.getProductId().equals(productId)).findFirst().orElse(null);
                 if(productSales == null){
                     productSales = new Audit.Sales.ProductSales(productId, name, quantity, quantity*price, price);
                     productSalesList.add(productSales);

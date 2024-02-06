@@ -1,19 +1,20 @@
 package com.nextuple.pranay.backend.controller.input;
 
 import com.nextuple.pranay.backend.model.Order;
-import com.nextuple.pranay.backend.model.Product;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+@Setter
+@Getter
+@NoArgsConstructor
 public class ProductsCatalog {
     private List<ProductData> products= new ArrayList<>();
-    public ProductsCatalog() {
-        // Default constructor needed for Jackson deserialization
-    }
+    @Setter
+    @Getter
     public static class ProductData{
         private String productId;
         private int quantity;
@@ -27,33 +28,6 @@ public class ProductsCatalog {
             this.safeQuantity = safeQuantity;
         }
 
-        public String getProductId() {
-            return productId;
-        }
-
-        public void setProductId(String productId) {
-            this.productId = productId;
-        }
-
-        public int getQuantity() {
-            return quantity;
-        }
-
-        public void setQuantity(int quantity) {
-            this.quantity = quantity;
-        }
-
-        public double getPrice() {
-            return price;
-        }
-
-        public void setPrice(double price) {
-            this.price = price;
-        }
-
-        public int getSafeQuantity() {
-            return safeQuantity;
-        }
         public Order.ProductDetails toProductDetails(){
             return new Order.ProductDetails(productId, quantity, price);
         }
@@ -65,20 +39,9 @@ public class ProductsCatalog {
                     "price=" + price + "\t" +
                     "safeQuantity=" + safeQuantity + "\n";
         }
-        public void setSafeQuantity(int safeQuantity) {
-            this.safeQuantity = safeQuantity;
-        }
     }
 
     public ProductsCatalog(List<ProductData> products) {
-        this.products = products;
-    }
-
-    public List<ProductData> getProducts() {
-        return products;
-    }
-
-    public void setProducts(List<ProductData> products) {
         this.products = products;
     }
 

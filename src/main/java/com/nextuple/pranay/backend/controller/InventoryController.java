@@ -1,7 +1,6 @@
 package com.nextuple.pranay.backend.controller;
 
 import com.nextuple.pranay.backend.controller.validator.InputValidator;
-import com.nextuple.pranay.backend.exception.CustomException;
 import com.nextuple.pranay.backend.model.Inventory;
 import com.nextuple.pranay.backend.service.InventoryServices;
 import org.slf4j.Logger;

@@ -2,7 +2,6 @@ package com.nextuple.pranay.backend.controller.validator;
 
 import com.nextuple.pranay.backend.controller.input.ProductsCatalog;
 import com.nextuple.pranay.backend.exception.CustomException;
-import com.nextuple.pranay.backend.model.Inventory;
 import com.nextuple.pranay.backend.model.Product;
 
 public class InputValidator {

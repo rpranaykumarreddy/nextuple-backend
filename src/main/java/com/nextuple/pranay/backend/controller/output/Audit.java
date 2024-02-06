@@ -1,9 +1,17 @@
 package com.nextuple.pranay.backend.controller.output;
 
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 import java.time.LocalDateTime;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 
+@Setter
+@Getter
+@NoArgsConstructor
 public class Audit {
     private Sales sales;
     private Purchase purchase;
@@ -18,7 +26,7 @@ public class Audit {
         this.profit = profit;
         this.productWithoutInventory = productWithoutInventory;
         this.productWithStockLessThanSafeQuantity = productWithStockLessThanSafeQuantity;
-        this.auditTime = LocalDateTime.now();
+        updateAuditTime();
     }
     @Override
     public boolean equals(Object o) {
@@ -35,52 +43,9 @@ public class Audit {
     public int hashCode() {
         return Objects.hash(sales, purchase, profit, productWithoutInventory, productWithStockLessThanSafeQuantity);
     }
-    public Sales getSales() {
-        return sales;
-    }
 
-    public void setSales(Sales sales) {
-        this.sales = sales;
-    }
-
-    public Purchase getPurchase() {
-        return purchase;
-    }
-
-    public void setPurchase(Purchase purchase) {
-        this.purchase = purchase;
-    }
-
-    public Profit getProfit() {
-        return profit;
-    }
-
-    public void setProfit(Profit profit) {
-        this.profit = profit;
-    }
-
-    public ProductWithoutInventory getProductWithoutInventory() {
-        return productWithoutInventory;
-    }
-
-    public void setProductWithoutInventory(ProductWithoutInventory productWithoutInventory) {
-        this.productWithoutInventory = productWithoutInventory;
-    }
-
-    public ProductWithStockLessThanSafeQuantity getProductWithStockLessThanSafeQuantity() {
-        return productWithStockLessThanSafeQuantity;
-    }
-
-    public void setProductWithStockLessThanSafeQuantity(ProductWithStockLessThanSafeQuantity productWithStockLessThanSafeQuantity) {
-        this.productWithStockLessThanSafeQuantity = productWithStockLessThanSafeQuantity;
-    }
-
-    public LocalDateTime getAuditTime() {
-        return auditTime;
-    }
-
-    public void setAuditTime(LocalDateTime auditTime) {
-        this.auditTime = auditTime;
+    public void updateAuditTime() {
+        this.auditTime = LocalDateTime.now();
     }
 
     /*
@@ -96,10 +61,15 @@ public class Audit {
                     -> totalIncome
                     -> incomePerItem
         */
+    @Getter
     public static class Sales{
+        @Setter
         private long orderCount;
+        @Setter
         private long uniqueProductCount;
+        @Setter
         private long totalItemCount;
+        @Setter
         private double totalIncome;
         private List<ProductSales> productDetails;
 
@@ -132,41 +102,6 @@ public class Audit {
         public void sortProductDetails(){
             this.productDetails.sort((o1, o2) -> (int) (o2.getItemCount() - o1.getItemCount()));
         }
-        public long getOrderCount() {
-            return orderCount;
-        }
-
-        public void setOrderCount(long orderCount) {
-            this.orderCount = orderCount;
-        }
-
-        public long getUniqueProductCount() {
-            return uniqueProductCount;
-        }
-
-        public void setUniqueProductCount(long uniqueProductCount) {
-            updateUniqueProductCount();
-        }
-
-        public long getTotalItemCount() {
-            return totalItemCount;
-        }
-
-        public void setTotalItemCount(long totalItemCount) {
-            this.totalItemCount = totalItemCount;
-        }
-
-        public double getTotalIncome() {
-            return totalIncome;
-        }
-
-        public void setTotalIncome(double totalIncome) {
-            this.totalIncome = totalIncome;
-        }
-
-        public List<ProductSales> getProductDetails() {
-            return productDetails;
-        }
 
         public void setProductDetails(List<ProductSales> productDetails) {
             this.productDetails = productDetails;
@@ -174,6 +109,8 @@ public class Audit {
             sortProductDetails();
         }
 
+        @Setter
+        @Getter
         public static class ProductSales{
             private String productId;
             private String productName;
@@ -203,45 +140,7 @@ public class Audit {
             public int hashCode() {
                 return Objects.hash(productId, productName, itemCount, totalIncome, incomePerItem);
             }
-            public String getProductId() {
-                return productId;
-            }
 
-            public void setProductId(String productId) {
-                this.productId = productId;
-            }
-
-            public String getProductName() {
-                return productName;
-            }
-
-            public void setProductName(String productName) {
-                this.productName = productName;
-            }
-
-            public long getItemCount() {
-                return itemCount;
-            }
-
-            public void setItemCount(long itemCount) {
-                this.itemCount = itemCount;
-            }
-
-            public double getTotalIncome() {
-                return totalIncome;
-            }
-
-            public void setTotalIncome(double totalIncome) {
-                this.totalIncome = totalIncome;
-            }
-
-            public double getIncomePerItem() {
-                return incomePerItem;
-            }
-
-            public void setIncomePerItem(double incomePerItem) {
-                this.incomePerItem = incomePerItem;
-            }
         }
 
     }
@@ -259,53 +158,30 @@ public class Audit {
             -> expenditurePerItem
      */
 
+    @Getter
     public static class Purchase{
+        @Setter
         private long orderCount;
+        @Setter
         private long uniqueProductCount;
+        @Setter
         private long totalItemCount;
+        @Setter
         private double totalExpenditure;
         private List<ProductPurchase> productDetails;
-
-        public long getOrderCount() {
-            return orderCount;
-        }
-
-        public void setOrderCount(long orderCount) {
-            this.orderCount = orderCount;
-        }
-
-        public long getUniqueProductCount() {
-            return uniqueProductCount;
-        }
-
-        public void setUniqueProductCount(long uniqueProductCount) {
-            updateUniqueProductCount();
-        }
-
-        public long getTotalItemCount() {
-            return totalItemCount;
-        }
-
-        public void setTotalItemCount(long totalItemCount) {
-            this.totalItemCount = totalItemCount;
-        }
-
-        public double getTotalExpenditure() {
-            return totalExpenditure;
-        }
-
-        public void setTotalExpenditure(double totalExpenditure) {
-            this.totalExpenditure = totalExpenditure;
-        }
-
-        public List<ProductPurchase> getProductDetails() {
-            return productDetails;
-        }
 
         public void setProductDetails(List<ProductPurchase> productDetails) {
             this.productDetails = productDetails;
             updateUniqueProductCount();
             sortProductDetails();
+        }
+
+        private void sortProductDetails() {
+            this.productDetails.sort((o1, o2) -> (int) (o2.getItemCount() - o1.getItemCount()));
+        }
+
+        private void updateUniqueProductCount() {
+            this.uniqueProductCount = productDetails.size();
         }
 
         public Purchase(long orderCount,  long totalItemCount, double totalExpenditure, List<ProductPurchase> productDetails) {
@@ -331,14 +207,8 @@ public class Audit {
         public int hashCode() {
             return Objects.hash(orderCount, uniqueProductCount, totalItemCount, totalExpenditure, productDetails);
         }
-        private void sortProductDetails() {
-            this.productDetails.sort((o1, o2) -> (int) (o2.getItemCount() - o1.getItemCount()));
-        }
-
-        private void updateUniqueProductCount() {
-            this.uniqueProductCount = productDetails.size();
-        }
-
+        @Setter
+        @Getter
         public static class ProductPurchase{
             private String productId;
             private String productName;
@@ -371,45 +241,6 @@ public class Audit {
                 return Objects.hash(productId, productName, itemCount, totalExpenditure, expenditurePerItem);
             }
 
-            public String getProductId() {
-                return productId;
-            }
-
-            public void setProductId(String productId) {
-                this.productId = productId;
-            }
-
-            public String getProductName() {
-                return productName;
-            }
-
-            public void setProductName(String productName) {
-                this.productName = productName;
-            }
-
-            public long getItemCount() {
-                return itemCount;
-            }
-
-            public void setItemCount(long itemCount) {
-                this.itemCount = itemCount;
-            }
-
-            public double getTotalExpenditure() {
-                return totalExpenditure;
-            }
-
-            public void setTotalExpenditure(double totalExpenditure) {
-                this.totalExpenditure = totalExpenditure;
-            }
-
-            public double getExpenditurePerItem() {
-                return expenditurePerItem;
-            }
-
-            public void setExpenditurePerItem(double expenditurePerItem) {
-                this.expenditurePerItem = expenditurePerItem;
-            }
         }
     }
     /*
@@ -422,7 +253,9 @@ public class Audit {
             -> profitPerItem
             -> profitRank
      */
+    @Getter
     public static class Profit {
+        @Setter
         private double totalProfit;
         private List<ProductProfit> productDetails;
 
@@ -447,18 +280,6 @@ public class Audit {
 
         private void sortProductDetails() {
             this.productDetails.sort((o1, o2) -> (int) (o2.getTotalProfit() - o1.getTotalProfit()));
-        }
-
-        public double getTotalProfit() {
-            return totalProfit;
-        }
-
-        public void setTotalProfit(double totalProfit) {
-            this.totalProfit = totalProfit;
-        }
-
-        public List<ProductProfit> getProductDetails() {
-            return productDetails;
         }
 
         public void setProductDetails(List<ProductProfit> productDetails) {
@@ -563,7 +384,7 @@ public class Audit {
         }
 
         private void sortProductDetails() {
-            this.productDetails.sort((o1, o2) -> o1.getProductId().compareTo(o2.getProductId()));
+            this.productDetails.sort(Comparator.comparing(ProductDetails::getProductId));
         }
 
         public long getCountOfProduct() {
@@ -584,6 +405,8 @@ public class Audit {
             updateCountOfProduct();
         }
 
+        @Setter
+        @Getter
         public static class ProductDetails {
             private String productId;
             private String productName;
@@ -607,30 +430,6 @@ public class Audit {
             public int hashCode() {
                 return Objects.hash(productId, productName, productCategory);
             }
-
-            public String getProductId() {
-                return productId;
-            }
-
-            public void setProductId(String productId) {
-                this.productId = productId;
-            }
-
-            public String getProductName() {
-                return productName;
-            }
-
-            public void setProductName(String productName) {
-                this.productName = productName;
-            }
-
-            public String getProductCategory() {
-                return productCategory;
-            }
-
-            public void setProductCategory(String productCategory) {
-                this.productCategory = productCategory;
-            }
         }
     }
     /*
@@ -645,6 +444,7 @@ public class Audit {
             -> stockNeeded
             -> expenditureNeeded
      */
+    @Getter
     public static class ProductWithStockLessThanSafeQuantity {
         private long countOfProduct;
         private double totalExpenditureNeeded;
@@ -680,24 +480,12 @@ public class Audit {
             this.totalExpenditureNeeded = productDetails.stream().mapToDouble(ProductDetails::getExpenditureNeeded).sum();
         }
 
-        public long getCountOfProduct() {
-            return countOfProduct;
-        }
-
         public void setCountOfProduct(long countOfProduct) {
             updateCountOfProduct();
         }
 
-        public double getTotalExpenditureNeeded() {
-            return totalExpenditureNeeded;
-        }
-
         public void setTotalExpenditureNeeded(double totalExpenditureNeeded) {
             updateTotalExpenditureNeeded();
-        }
-
-        public List<ProductDetails> getProductDetails() {
-            return productDetails;
         }
 
         public void setProductDetails(List<ProductDetails> productDetails) {
@@ -707,6 +495,8 @@ public class Audit {
             updateTotalExpenditureNeeded();
         }
 
+        @Setter
+        @Getter
         public static class ProductDetails {
             private String productId;
             private String productName;
@@ -714,52 +504,12 @@ public class Audit {
             private int safeQuantity;
             private int stockNeeded;
             private double expenditureNeeded;
-
-            public String getProductId() {
-                return productId;
-            }
-
-            public void setProductId(String productId) {
+            public ProductDetails(String productId, String productName, int currentStock, int safeQuantity, int stockNeeded, double expenditureNeeded) {
                 this.productId = productId;
-            }
-
-            public String getProductName() {
-                return productName;
-            }
-
-            public void setProductName(String productName) {
                 this.productName = productName;
-            }
-
-            public int getCurrentStock() {
-                return currentStock;
-            }
-
-            public void setCurrentStock(int currentStock) {
                 this.currentStock = currentStock;
-            }
-
-            public int getSafeQuantity() {
-                return safeQuantity;
-            }
-
-            public void setSafeQuantity(int safeQuantity) {
                 this.safeQuantity = safeQuantity;
-            }
-
-            public int getStockNeeded() {
-                return stockNeeded;
-            }
-
-            public void setStockNeeded(int stockNeeded) {
                 this.stockNeeded = stockNeeded;
-            }
-
-            public double getExpenditureNeeded() {
-                return expenditureNeeded;
-            }
-
-            public void setExpenditureNeeded(double expenditureNeeded) {
                 this.expenditureNeeded = expenditureNeeded;
             }
             @Override
@@ -777,15 +527,6 @@ public class Audit {
             @Override
             public int hashCode() {
                 return Objects.hash(productId, productName, currentStock, safeQuantity, stockNeeded, expenditureNeeded);
-            }
-
-            public ProductDetails(String productId, String productName, int currentStock, int safeQuantity, int stockNeeded, double expenditureNeeded) {
-                this.productId = productId;
-                this.productName = productName;
-                this.currentStock = currentStock;
-                this.safeQuantity = safeQuantity;
-                this.stockNeeded = stockNeeded;
-                this.expenditureNeeded = expenditureNeeded;
             }
         }
     }

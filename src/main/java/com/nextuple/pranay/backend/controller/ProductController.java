@@ -1,7 +1,6 @@
 package com.nextuple.pranay.backend.controller;
 
 import com.nextuple.pranay.backend.controller.validator.InputValidator;
-import com.nextuple.pranay.backend.exception.CustomException;
 import com.nextuple.pranay.backend.model.Product;
 import com.nextuple.pranay.backend.service.ProductServices;
 import org.springframework.beans.factory.annotation.Autowired;

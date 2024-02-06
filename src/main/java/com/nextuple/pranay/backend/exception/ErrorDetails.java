@@ -1,12 +1,15 @@
 package com.nextuple.pranay.backend.exception;
 
+import lombok.Getter;
+
 import java.time.LocalDateTime;
 
+@Getter
 public class ErrorDetails {
     private LocalDateTime timeStamp;
-    private String error;
-    private String message;
-    private String description;
+    private final String error;
+    private final String message;
+    private final String description;
 
     public ErrorDetails(String error, String message, String description) {
         this.error = error;
@@ -19,19 +22,4 @@ public class ErrorDetails {
         this.timeStamp = LocalDateTime.now();
     }
 
-    public LocalDateTime getTimeStamp() {
-        return timeStamp;
-    }
-
-    public String getError() {
-        return error;
-    }
-
-    public String getMessage() {
-        return message;
-    }
-
-    public String getDescription() {
-        return description;
-    }
 }

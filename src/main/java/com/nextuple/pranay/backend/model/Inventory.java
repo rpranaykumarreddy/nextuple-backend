@@ -1,19 +1,22 @@
 package com.nextuple.pranay.backend.model;
 
-import org.bson.types.ObjectId;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
-import org.springframework.http.HttpStatusCode;
 
 import java.time.LocalDateTime;
 
+@Getter
 @Document(collection = "inventory")
 public class Inventory {
+    @Setter
     @Id
     private String id;
     private String productId;
     private int quantity;
     private int safeQuantity;
+    @Setter
     private LocalDateTime lastTime;
 
     public Inventory(String productId, int quantity, int safeQuantity) {
@@ -23,26 +26,9 @@ public class Inventory {
         updateTimeStamp();
     }
 
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public String getProductId() {
-
-        return productId;
-    }
-
     public void setProductId(String productId) {
         this.productId = productId;
         updateTimeStamp();
-    }
-
-    public int getQuantity() {
-        return quantity;
     }
 
     public void setQuantity(int quantity) {
@@ -50,21 +36,11 @@ public class Inventory {
         updateTimeStamp();
     }
 
-    public int getSafeQuantity() {
-        return safeQuantity;
-    }
-
     public void setSafeQuantity(int safeQuantity) {
         this.safeQuantity = safeQuantity;
+        updateTimeStamp();
     }
 
-    public LocalDateTime getLastTime() {
-        return lastTime;
-    }
-
-    public void setLastTime(LocalDateTime lastTime) {
-        this.lastTime = lastTime;
-    }
     public void updateTimeStamp() {
         this.lastTime = LocalDateTime.now();
     }
