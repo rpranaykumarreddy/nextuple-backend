@@ -20,11 +20,6 @@ public class Order {
     @Setter
     private LocalDateTime lastTime;
 
-    public void setTotalPrice(double totalPrice) {
-        this.totalPrice = totalPrice;
-        updateTimeStamp();
-    }
-
     public enum OrderType{SALE_ORDER, PURCHASE_ORDER}
 
     public Order(List<ProductDetails> productCatalog, OrderType type, double totalPrice) {
@@ -34,8 +29,7 @@ public class Order {
         updateTimeStamp();
     }
 
-    @Setter
-    @Getter
+    @Setter @Getter
     public static class ProductDetails{
         private String productId;
         private int quantity;
@@ -46,40 +40,9 @@ public class Order {
             this.quantity = quantity;
             this.price = price;
         }
-
-        @Override
-        public String toString() {
-            return "ProductDetails{" +
-                    "productId='" + productId + '\'' +
-                    ", quantity=" + quantity +
-                    ", price=" + price +
-                    '}';
-        }
     }
-
-    public void setType(OrderType type) {
-        this.type = type;
-        updateTimeStamp();
-    }
-
-    public void setProductCatalog(List<ProductDetails> productCatalog) {
-        this.productCatalog = productCatalog;
-        updateTimeStamp();
-    }
-
     public void updateTimeStamp() {
         this.lastTime = LocalDateTime.now();
-    }
-
-    @Override
-    public String toString() {
-        return "Order{" +
-                "id='" + id + '\'' +
-                ", type=" + type +
-                ", productCatalog=" + productCatalog +
-                ", totalPrice=" + totalPrice +
-                ", lastTime=" + lastTime +
-                '}';
     }
 }
 

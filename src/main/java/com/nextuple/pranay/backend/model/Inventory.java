@@ -16,18 +16,12 @@ public class Inventory {
     private String productId;
     private int quantity;
     private int safeQuantity;
-    @Setter
     private LocalDateTime lastTime;
 
     public Inventory(String productId, int quantity, int safeQuantity) {
         this.productId = productId;
         this.quantity = quantity;
         this.safeQuantity = safeQuantity;
-        updateTimeStamp();
-    }
-
-    public void setProductId(String productId) {
-        this.productId = productId;
         updateTimeStamp();
     }
 
@@ -40,20 +34,7 @@ public class Inventory {
         this.safeQuantity = safeQuantity;
         updateTimeStamp();
     }
-
     public void updateTimeStamp() {
         this.lastTime = LocalDateTime.now();
     }
-
-    @Override
-    public String toString() {
-        return "Inventory{" +
-                "id='" + id + '\'' +
-                ", productId='" + productId + '\'' +
-                ", quantity=" + quantity +
-                ", safeQuantity=" + safeQuantity +
-                ", lastTime=" + lastTime +
-                '}';
-    }
-
 }

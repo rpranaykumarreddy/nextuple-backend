@@ -32,28 +32,10 @@ public class ProductsCatalog {
             return new Order.ProductDetails(productId, quantity, price);
         }
 
-        @Override
-        public String toString() {
-            return  "productId=" + productId + "\t" +
-                    "quantity=" + quantity + "\t" +
-                    "price=" + price + "\t" +
-                    "safeQuantity=" + safeQuantity + "\n";
-        }
     }
 
     public ProductsCatalog(List<ProductData> products) {
         this.products = products;
     }
 
-    public List<Order.ProductDetails> toProductDetails(){
-        List<Order.ProductDetails> productDetails= new ArrayList<>();
-        for(ProductData productData: products){
-            productDetails.add(productData.toProductDetails());
-        }
-        return productDetails;
-    }
-    @Override
-    public String toString() {
-        return "ProductsCatalog:\n" +products + "\n";
-    }
 }

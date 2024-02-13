@@ -5,13 +5,13 @@ import com.nextuple.pranay.backend.exception.CustomException;
 import com.nextuple.pranay.backend.model.Product;
 
 public class InputValidator {
-    protected static void IdValidator(String id){
-        if(id==null || id.isEmpty()){
+    public static void IdValidator(String id){
+        if(id==null || id.isBlank()){
             throw new CustomException.ValidationException("Id cannot be empty");
         }
     }
-    protected static void nameValidator(String name){
-        if(name==null || name.isEmpty()){
+    public static void nameValidator(String name){
+        if(name==null || name.isBlank()){
             throw new CustomException.ValidationException("Name cannot be empty");
         }
         if(name.length()>50){
@@ -21,13 +21,13 @@ public class InputValidator {
             throw new CustomException.ValidationException("Name cannot be less than 3 characters");
         }
     }
-    protected static void priceValidator(double price){
+    public static void priceValidator(double price){
         if(price<0){
             throw new CustomException.ValidationException("Price cannot be less than or equal to 0");
         }
     }
-    protected static void categoryValidator(String category){
-        if(category==null || category.isEmpty() ){
+    public static void categoryValidator(String category){
+        if(category==null || category.isBlank() ){
             throw new CustomException.ValidationException("Category cannot be empty");
         }
         if(category.length()>20){
